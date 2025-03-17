@@ -1,0 +1,22 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.env
+.env
+*.log
+
+# Docker
+*.db
+*.pid
+*.sock
+*.log
+docker-compose.override.yml
+
+# Node modules (frontend)
+frontend/node_modules
+
+# Environment
+.env
+.env.production
+.env.local
