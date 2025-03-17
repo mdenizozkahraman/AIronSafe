@@ -8,8 +8,5 @@ AIronSafe is a web-based security testing platform that integrates SAST and DAST
 git clone https://github.com/USERNAME/AIronSafe.git
 cd AIronSafe
 
-
-### 2. Build with Docker
-
 docker-compose up --build
 
