@@ -1,30 +1,27 @@
 import React from 'react';
-import { commonStyles } from '../styles/commonStyles';
+import { Link } from 'react-router-dom';
+import '../styles/Dashboard.css';
 
 const Dashboard = () => {
     return (
-        <div style={commonStyles.container}>
-            {/* Header */}
-            <header style={commonStyles.header}>
+        <div className="dashboard-container">
+            <header className="dashboard-header">
                 AIronSafe Dashboard
             </header>
 
-            {/* Navbar */}
-            <nav style={commonStyles.nav}>
+            <nav className="dashboard-nav">
                 <div>
-                    <a href="/dashboard" style={commonStyles.link}>Dashboard</a>
-                    <a href="/sast" style={commonStyles.link}>SAST</a>
-                    <a href="/dast" style={commonStyles.link}>DAST</a>
+                    <Link to="/dashboard">Dashboard</Link>
+                    <Link to="/sast">SAST</Link>
+                    <Link to="/dast">DAST</Link>
                 </div>
                 <div>
-                    <a href="/" style={commonStyles.link}>Logout</a>
+                    <Link to="/">Logout</Link>
                 </div>
             </nav>
 
-            {/* Content */}
-            <div style={commonStyles.content}>
-                {/* Sidebar */}
-                <div style={commonStyles.sidebar}>
+            <div className="container">
+                <div className="sidebar">
                     <h3>Navigation</h3>
                     <ul>
                         <li>Overview</li>
@@ -34,24 +31,41 @@ const Dashboard = () => {
                     </ul>
                 </div>
 
-                {/* Main */}
-                <div style={commonStyles.main}>
-                    <div style={commonStyles.stats}>
-                        <div style={commonStyles.card}>
+                <div className="main">
+                    <div className="stats">
+                        <div className="card">
                             <h4>Total Scans</h4>
                             <p>120</p>
                         </div>
-                        <div style={commonStyles.card}>
+                        <div className="card">
                             <h4>Critical Issues</h4>
                             <p>15</p>
                         </div>
-                        <div style={commonStyles.card}>
+                        <div className="card">
                             <h4>Resolved Issues</h4>
                             <p>105</p>
                         </div>
                     </div>
+
+                    <div className="chart">
+                        <h4>Scan Activity (Last 30 Days)</h4>
+                        <p>[Chart Placeholder]</p>
+                    </div>
+
+                    <div className="recent-activity">
+                        <h4>Recent Activity</h4>
+                        <ul>
+                            <li>SAST scan completed on file1.py</li>
+                            <li>DAST scan completed for https://example.com</li>
+                            <li>Report generated: Report_01.pdf</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
+
+            <footer className="dashboard-footer">
+                <p>&copy; 2025 AIronSafe. All Rights Reserved.</p>
+            </footer>
         </div>
     );
 };

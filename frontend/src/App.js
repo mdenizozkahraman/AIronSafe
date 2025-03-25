@@ -5,7 +5,7 @@ import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 import SAST from './components/SAST';
 import DAST from './components/DAST';
-
+import './App.css';
 
 const App = () => {
   const [showLogin, setShowLogin] = useState(true);
@@ -16,12 +16,10 @@ const App = () => {
   return (
     <Router>
       <div style={styles.appContainer}>
-        {/* Header */}
         <header style={styles.header}>
           AIronSafe
         </header>
 
-        {/* Routes */}
         <div style={styles.content}>
           <Routes>
             <Route 
@@ -38,7 +36,6 @@ const App = () => {
           </Routes>
         </div>
 
-        {/* Footer */}
         <footer style={styles.footer}>
           © 2025 AIronSafe. All Rights Reserved.
         </footer>
@@ -68,7 +65,7 @@ const styles = {
   },
   content: {
     flexGrow: 1,
-    marginTop: '5rem', // Header yüksekliğine göre boşluk bırakıyoruz
+    marginTop: '5rem',
     overflowY: 'auto'
   },
   footer: {

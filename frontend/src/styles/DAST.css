@@ -1,0 +1,317 @@
+.dast-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+.dast-nav {
+  background: #1a237e;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+}
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+.nav-links a:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.nav-links a.active {
+  background: rgba(255, 255, 255, 0.2);
+}
+.logout-button {
+  background: transparent;
+  border: 1px solid white;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.logout-button:hover {
+  background: white;
+  color: #1a237e;
+}
+.dast-content {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.dast-content h1 {
+  color: #1a237e;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+.dast-scan-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+.scan-box {
+  text-align: center;
+}
+.scan-box h2 {
+  color: #1a237e;
+  margin-bottom: 1rem;
+}
+.scan-box p {
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+.url-input {
+  width: 100%;
+  max-width: 500px;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+.url-input:focus {
+  outline: none;
+  border-color: #1a237e;
+}
+.scan-button {
+  background: #1a237e;
+  color: white;
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+.scan-button:hover:not(:disabled) {
+  background: #0d47a1;
+}
+.scan-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+.dast-results {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+.dast-results h2 {
+  color: #1a237e;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+.result-card {
+  padding: 1.5rem;
+  border-radius: 5px;
+  text-align: center;
+  color: white;
+}
+.result-card.high {
+  background: #d32f2f;
+}
+.result-card.medium {
+  background: #f57c00;
+}
+.result-card.low {
+  background: #388e3c;
+}
+.result-card h3 {
+  margin-bottom: 0.5rem;
+}
+.result-card .severity {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+.result-card .count {
+  font-size: 1.2rem;
+}
+.total-issues {
+  text-align: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid #eee;
+}
+.total-issues h3 {
+  color: #1a237e;
+}
+.scan-section {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 2rem;
+  margin: 1rem 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.url-input-box {
+  text-align: center;
+}
+.url-input-box h2 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+.url-input-box p {
+  color: #666;
+  margin-bottom: 2rem;
+}
+.url-form {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.url-field {
+  flex: 1;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+.url-field:focus {
+  border-color: #4CAF50;
+  outline: none;
+}
+.scan-button {
+  padding: 12px 24px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.scan-button:hover {
+  background-color: #45a049;
+}
+.scan-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+.card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.3s;
+}
+.card:hover {
+  transform: translateY(-5px);
+}
+.card h4 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+.card p {
+  font-size: 2rem;
+  font-weight: bold;
+}
+.card p.high {
+  color: #e74c3c;
+}
+.card p.medium {
+  color: #f39c12;
+}
+.card p.low {
+  color: #3498db;
+}
+.vulnerabilities-list {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  margin: 2rem 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.vulnerabilities-list h4 {
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+}
+.vuln-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+.vuln-card {
+  padding: 1.5rem;
+  border-radius: 8px;
+  background: #f8f9fa;
+  transition: transform 0.3s;
+}
+.vuln-card:hover {
+  transform: translateY(-5px);
+}
+.vuln-card.high {
+  border-left: 4px solid #e74c3c;
+}
+.vuln-card.medium {
+  border-left: 4px solid #f39c12;
+}
+.vuln-card.low {
+  border-left: 4px solid #3498db;
+}
+.vuln-card h3 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+.vuln-card p {
+  color: #666;
+  margin: 0.5rem 0;
+}
+.scan-info {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  margin: 2rem 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.scan-info h4 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+.scan-info p {
+  color: #666;
+  margin: 0.5rem 0;
+}
+@media (max-width: 768px) {
+  .url-form {
+    flex-direction: column;
+  }
+  .url-field {
+    width: 100%;
+  }
+  .scan-button {
+    width: 100%;
+  }
+  .vuln-grid {
+    grid-template-columns: 1fr;
+  }
+} 
