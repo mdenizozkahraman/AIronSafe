@@ -22,13 +22,18 @@ const SAST = () => {
       setScanning(false);
       setResults({
         vulnerabilities: [
-          { type: 'SQL Injection', severity: 'High', count: 2 },
-          { type: 'XSS', severity: 'Medium', count: 3 },
-          { type: 'Command Injection', severity: 'High', count: 1 },
-          { type: 'Path Traversal', severity: 'Medium', count: 2 },
-          { type: 'Insecure Configuration', severity: 'Low', count: 4 }
+          { type: 'SQL Injection', severity: 'High', count: 2, location: 'database/queries.py:45' },
+          { type: 'Command Injection', severity: 'High', count: 1, location: 'utils/system.py:23' },
+          { type: 'Insecure Deserialization', severity: 'Medium', count: 3, location: 'api/parser.py:78' },
+          { type: 'Hardcoded Credentials', severity: 'Medium', count: 2, location: 'config/settings.py:12' },
+          { type: 'Debug Mode Enabled', severity: 'Low', count: 1, location: 'app/main.py:8' },
+          { type: 'Insecure Import', severity: 'Low', count: 2, location: 'utils/loader.py:34' }
         ],
-        totalIssues: 12
+        totalIssues: 11,
+        scanTime: '3 minutes 20 seconds',
+        scannedFile: file.name,
+        fileSize: file.size,
+        fileType: file.name.split('.').pop()
       });
     }, 2000);
   };
@@ -36,7 +41,7 @@ const SAST = () => {
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
-        AIronSafe Dashboard
+        <span className="navbar-logo">AIronSafe</span>
       </header>
 
       <nav className="dashboard-nav">
@@ -65,11 +70,12 @@ const SAST = () => {
           <div className="scan-section">
             <div className="upload-box">
               <h2>Static Application Security Testing</h2>
+              <p>Upload your source code files for security analysis. Supported formats: .py, .java, .c, .cpp, .js, .php, .cs, .rb, .go</p>
               <div className="file-upload">
                 <input
                   type="file"
                   onChange={handleFileChange}
-                  accept=".zip,.rar,.7zip,.tar,.gz"
+                  accept=".py,.java,.c,.cpp,.js,.php,.cs,.rb,.go"
                 />
                 <button 
                   onClick={handleScan}
@@ -84,18 +90,73 @@ const SAST = () => {
 
           {results && (
             <>
-              <div className="stats">
-                <div className="card">
-                  <h4>High Severity</h4>
-                  <p className="high">{results.vulnerabilities.filter(v => v.severity === 'High').reduce((acc, v) => acc + v.count, 0)}</p>
-                </div>
-                <div className="card">
-                  <h4>Medium Severity</h4>
-                  <p className="medium">{results.vulnerabilities.filter(v => v.severity === 'Medium').reduce((acc, v) => acc + v.count, 0)}</p>
-                </div>
-                <div className="card">
-                  <h4>Low Severity</h4>
-                  <p className="low">{results.vulnerabilities.filter(v => v.severity === 'Low').reduce((acc, v) => acc + v.count, 0)}</p>
+              <div className="scan-summary-card">
+                <h4>Scan Summary</h4>
+                <div className="scan-summary-content">
+                  <div className="scan-summary-section">
+                    <h5>File Information</h5>
+                    <div className="scan-info-grid">
+                      <div className="info-item">
+                        <span className="info-label">Scanned File</span>
+                        <span className="info-value">{results.scannedFile}</span>
+                      </div>
+                      <div className="info-item">
+                        <span className="info-label">File Type</span>
+                        <span className="info-value">{results.fileType.toUpperCase()}</span>
+                      </div>
+                      <div className="info-item">
+                        <span className="info-label">File Size</span>
+                        <span className="info-value">{(results.fileSize / 1024).toFixed(2)} KB</span>
+                      </div>
+                      <div className="info-item">
+                        <span className="info-label">Scan Duration</span>
+                        <span className="info-value">{results.scanTime}</span>
+                      </div>
+                      <div className="info-item">
+                        <span className="info-label">Scan Status</span>
+                        <span className="info-value status-complete">Completed</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="scan-summary-section">
+                    <h5>Vulnerability Overview</h5>
+                    <div className="scan-info-grid">
+                      <div className="info-item">
+                        <span className="info-label">Total Issues</span>
+                        <span className="info-value highlight">{results.totalIssues}</span>
+                      </div>
+                      <div className="info-item">
+                        <span className="info-label">High Severity</span>
+                        <span className="info-value high">{results.vulnerabilities.filter(v => v.severity === 'High').reduce((acc, v) => acc + v.count, 0)}</span>
+                      </div>
+                      <div className="info-item">
+                        <span className="info-label">Medium Severity</span>
+                        <span className="info-value medium">{results.vulnerabilities.filter(v => v.severity === 'Medium').reduce((acc, v) => acc + v.count, 0)}</span>
+                      </div>
+                      <div className="info-item">
+                        <span className="info-label">Low Severity</span>
+                        <span className="info-value low">{results.vulnerabilities.filter(v => v.severity === 'Low').reduce((acc, v) => acc + v.count, 0)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="scan-summary-section">
+                    <h5>Most Critical Issues</h5>
+                    <div className="common-issues-list">
+                      {results.vulnerabilities
+                        .filter(v => v.severity === 'High')
+                        .map((vuln, index) => (
+                          <div key={index} className="common-issue-item">
+                            <div className="issue-info">
+                              <span className="issue-name">{vuln.type}</span>
+                              <span className="issue-location">{vuln.location}</span>
+                            </div>
+                            <span className="issue-count">{vuln.count} instances</span>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -106,6 +167,7 @@ const SAST = () => {
                     <div key={index} className={`vuln-card ${vuln.severity.toLowerCase()}`}>
                       <h3>{vuln.type}</h3>
                       <p className="severity">Severity: {vuln.severity}</p>
+                      <p className="location">Location: {vuln.location}</p>
                       <p className="count">Found: {vuln.count}</p>
                     </div>
                   ))}
@@ -115,10 +177,6 @@ const SAST = () => {
           )}
         </div>
       </div>
-
-      <footer className="dashboard-footer">
-        <p>&copy; 2025 AIronSafe. All Rights Reserved.</p>
-      </footer>
     </div>
   );
 };

@@ -3,14 +3,19 @@ import { Link } from 'react-router-dom';
 import '../styles/Dashboard.css';
 
 const Dashboard = () => {
+    const handleActivityClick = (type, details) => {
+        // Bu fonksiyon ilgili sayfaya yönlendirme yapacak
+        console.log(`Clicked ${type}: ${details}`);
+    };
+
     return (
         <div className="dashboard-container">
             <header className="dashboard-header">
-                AIronSafe Dashboard
+                <span className="navbar-logo">AIronSafe</span>
             </header>
 
             <nav className="dashboard-nav">
-                <div>
+                <div className="dashboard-nav-links">
                     <Link to="/dashboard">Dashboard</Link>
                     <Link to="/sast">SAST</Link>
                     <Link to="/dast">DAST</Link>
@@ -47,25 +52,41 @@ const Dashboard = () => {
                         </div>
                     </div>
 
-                    <div className="chart">
-                        <h4>Scan Activity (Last 30 Days)</h4>
-                        <p>[Chart Placeholder]</p>
-                    </div>
+                    <div className="activity-section">
+                        <div className="recent-activity-card">
+                            <h4>Recent Activity</h4>
+                            <div className="activity-list">
+                                <div className="activity-item" onClick={() => handleActivityClick('sast', 'file1.py')}>
+                                    <div className="activity-icon sast">🔍</div>
+                                    <div className="activity-content">
+                                        <h5>SAST Scan Completed</h5>
+                                        <p>file1.py</p>
+                                    </div>
+                                    <span className="activity-time">2 hours ago</span>
+                                </div>
 
-                    <div className="recent-activity">
-                        <h4>Recent Activity</h4>
-                        <ul>
-                            <li>SAST scan completed on file1.py</li>
-                            <li>DAST scan completed for https://example.com</li>
-                            <li>Report generated: Report_01.pdf</li>
-                        </ul>
+                                <div className="activity-item" onClick={() => handleActivityClick('dast', 'https://example.com')}>
+                                    <div className="activity-icon dast">🌐</div>
+                                    <div className="activity-content">
+                                        <h5>DAST Scan Completed</h5>
+                                        <p>https://example.com</p>
+                                    </div>
+                                    <span className="activity-time">3 hours ago</span>
+                                </div>
+
+                                <div className="activity-item" onClick={() => handleActivityClick('report', 'Report_01.pdf')}>
+                                    <div className="activity-icon report">📊</div>
+                                    <div className="activity-content">
+                                        <h5>Report Generated</h5>
+                                        <p>Report_01.pdf</p>
+                                    </div>
+                                    <span className="activity-time">5 hours ago</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <footer className="dashboard-footer">
-                <p>&copy; 2025 AIronSafe. All Rights Reserved.</p>
-            </footer>
         </div>
     );
 };

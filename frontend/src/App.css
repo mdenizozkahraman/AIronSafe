@@ -60,3 +60,48 @@ input {
     transform: rotate(360deg);
   }
 }
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.app-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #ddd;
+    padding: 1.5rem 0;
+    text-align: center;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-logo {
+    color: #1a237e;
+    font-size: 2rem;
+    font-weight: 700;
+    text-decoration: none;
+    background: linear-gradient(45deg, #1a237e, #0d47a1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.app-content {
+    flex-grow: 1;
+    margin-top: 5rem;
+    overflow-y: auto;
+}
+
+.app-footer {
+    text-align: center;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border-top: 1px solid #ddd;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}

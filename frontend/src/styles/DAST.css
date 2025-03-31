@@ -1,317 +1,481 @@
-.dast-container {
-  min-height: 100vh;
-  background-color: #f5f5f5;
-}
-.dast-nav {
-  background: #1a237e;
-  padding: 1rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: white;
-}
-.logo {
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-.nav-links {
-  display: flex;
-  gap: 2rem;
-  align-items: center;
-}
-.nav-links a {
-  color: white;
-  text-decoration: none;
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
-  transition: background-color 0.3s ease;
-}
-.nav-links a:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-.nav-links a.active {
-  background: rgba(255, 255, 255, 0.2);
-}
-.logout-button {
-  background: transparent;
-  border: 1px solid white;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-.logout-button:hover {
-  background: white;
-  color: #1a237e;
-}
-.dast-content {
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-.dast-content h1 {
-  color: #1a237e;
-  margin-bottom: 2rem;
-  text-align: center;
-}
-.dast-scan-section {
-  background: white;
-  padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
-}
-.scan-box {
-  text-align: center;
-}
-.scan-box h2 {
-  color: #1a237e;
-  margin-bottom: 1rem;
-}
-.scan-box p {
-  color: #666;
-  margin-bottom: 1.5rem;
-}
-.url-input {
-  width: 100%;
-  max-width: 500px;
-  padding: 0.8rem;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 1rem;
-  margin-bottom: 1.5rem;
-}
-.url-input:focus {
-  outline: none;
-  border-color: #1a237e;
-}
-.scan-button {
-  background: #1a237e;
-  color: white;
-  border: none;
-  padding: 0.8rem 2rem;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s ease;
-}
-.scan-button:hover:not(:disabled) {
-  background: #0d47a1;
-}
-.scan-button:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-}
-.dast-results {
-  background: white;
-  padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-.dast-results h2 {
-  color: #1a237e;
-  margin-bottom: 1.5rem;
-  text-align: center;
-}
-.results-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-.result-card {
-  padding: 1.5rem;
-  border-radius: 5px;
-  text-align: center;
-  color: white;
-}
-.result-card.high {
-  background: #d32f2f;
-}
-.result-card.medium {
-  background: #f57c00;
-}
-.result-card.low {
-  background: #388e3c;
-}
-.result-card h3 {
-  margin-bottom: 0.5rem;
-}
-.result-card .severity {
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-}
-.result-card .count {
-  font-size: 1.2rem;
-}
-.total-issues {
-  text-align: center;
-  padding-top: 1.5rem;
-  border-top: 1px solid #eee;
-}
-.total-issues h3 {
-  color: #1a237e;
-}
-.scan-section {
-  background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 2rem;
-  margin: 1rem 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-.url-input-box {
-  text-align: center;
-}
-.url-input-box h2 {
-  color: #2c3e50;
-  margin-bottom: 1rem;
-}
-.url-input-box p {
-  color: #666;
-  margin-bottom: 2rem;
-}
-.url-form {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  align-items: center;
-  max-width: 800px;
-  margin: 0 auto;
-}
-.url-field {
-  flex: 1;
-  padding: 12px;
-  border: 2px solid #e0e0e0;
-  border-radius: 6px;
-  font-size: 1rem;
-  transition: border-color 0.3s;
-}
-.url-field:focus {
-  border-color: #4CAF50;
-  outline: none;
-}
-.scan-button {
-  padding: 12px 24px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-.scan-button:hover {
-  background-color: #45a049;
-}
-.scan-button:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-}
-.stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin: 2rem 0;
-}
-.card {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  transition: transform 0.3s;
-}
-.card:hover {
-  transform: translateY(-5px);
-}
-.card h4 {
-  color: #2c3e50;
-  margin-bottom: 1rem;
-}
-.card p {
-  font-size: 2rem;
-  font-weight: bold;
-}
-.card p.high {
-  color: #e74c3c;
-}
-.card p.medium {
-  color: #f39c12;
-}
-.card p.low {
-  color: #3498db;
-}
-.vulnerabilities-list {
-  background: white;
-  border-radius: 8px;
-  padding: 2rem;
-  margin: 2rem 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-.vulnerabilities-list h4 {
-  color: #2c3e50;
-  margin-bottom: 1.5rem;
-}
-.vuln-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-}
-.vuln-card {
-  padding: 1.5rem;
-  border-radius: 8px;
-  background: #f8f9fa;
-  transition: transform 0.3s;
-}
-.vuln-card:hover {
-  transform: translateY(-5px);
-}
-.vuln-card.high {
-  border-left: 4px solid #e74c3c;
-}
-.vuln-card.medium {
-  border-left: 4px solid #f39c12;
-}
-.vuln-card.low {
-  border-left: 4px solid #3498db;
-}
-.vuln-card h3 {
-  color: #2c3e50;
-  margin-bottom: 1rem;
-  font-size: 1.1rem;
-}
-.vuln-card p {
-  color: #666;
-  margin: 0.5rem 0;
-}
-.scan-info {
-  background: white;
-  border-radius: 8px;
-  padding: 2rem;
-  margin: 2rem 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-.scan-info h4 {
-  color: #2c3e50;
-  margin-bottom: 1rem;
-}
-.scan-info p {
-  color: #666;
-  margin: 0.5rem 0;
-}
-@media (max-width: 768px) {
-  .url-form {
+.dashboard-container {
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    padding-top: 60px;
+    width: 100%;
+    display: flex;
     flex-direction: column;
-  }
-  .url-field {
+    overflow-x: hidden;
+    position: relative;
+}
+
+.dashboard-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 1rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100vw;
+}
+
+.dashboard-header .navbar-logo {
+    margin-left: 2rem;
+    color: #1a237e;
+    font-size: 1.8rem;
+    font-weight: 700;
+    background: linear-gradient(45deg, #1a237e, #0d47a1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.dashboard-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+    width: 100vw;
+}
+
+.dashboard-nav > div:first-child {
+    margin-left: 2rem;
+}
+
+.dashboard-nav > div:last-child {
+    margin-right: 2rem;
+}
+
+.container {
+    display: flex;
+    padding: 1.5rem;
+    gap: 1.5rem;
     width: 100%;
-  }
-  .scan-button {
+    flex: 1;
+    max-width: 100%;
+    overflow-x: hidden;
+    min-height: calc(100vh - 120px);
+    margin-bottom: 1rem;
+}
+
+.sidebar {
+    min-width: 250px;
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    height: fit-content;
+    position: sticky;
+    top: 80px;
+}
+
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: calc(100% - 290px);
+    overflow-x: hidden;
+    padding-bottom: 1rem;
+}
+
+.scan-section {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     width: 100%;
-  }
-  .vuln-grid {
-    grid-template-columns: 1fr;
-  }
+}
+
+.url-input-box {
+    width: 100%;
+}
+
+.url-input-box h2 {
+    color: #1a237e;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.url-form {
+    width: 100%;
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.url-field {
+    flex: 1;
+    padding: 0.5rem 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.url-field:focus {
+    outline: none;
+    border-color: #1a237e;
+}
+
+.scan-button {
+    padding: 0.5rem 2rem;
+    background: #1a237e;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.scan-button:hover {
+    background: #0d47a1;
+}
+
+.scan-button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    width: 100%;
+}
+
+.vulnerabilities-list {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.vuln-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.general-summary {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-top: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.general-summary h4 {
+    color: #1a237e;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.summary-content {
+    display: grid;
+    gap: 1rem;
+}
+
+.summary-content p {
+    font-size: 1.1rem;
+    color: #333;
+    padding: 0.5rem;
+    border-radius: 6px;
+    background: #f8f9fa;
+}
+
+.scan-summary {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.scan-summary h4 {
+    color: #1a237e;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.summary-item {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.summary-label {
+    color: #666;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.summary-value {
+    color: #1a237e;
+    font-size: 1.1rem;
+    font-weight: 600;
+    word-break: break-word;
+}
+
+.status-complete {
+    color: #2e7d32;
+}
+
+.status-pending {
+    color: #f57c00;
+}
+
+.status-failed {
+    color: #c62828;
+}
+
+.scan-summary-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.scan-summary-card h4 {
+    color: #1a237e;
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.scan-summary-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.scan-summary-section {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1.5rem;
+}
+
+.scan-summary-section h5 {
+    color: #333;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.scan-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.info-label {
+    color: #666;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.info-value {
+    color: #1a237e;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.info-value.highlight {
+    color: #1a237e;
+    font-size: 1.4rem;
+}
+
+.info-value.high {
+    color: #c62828;
+}
+
+.info-value.medium {
+    color: #f57c00;
+}
+
+.info-value.low {
+    color: #2e7d32;
+}
+
+.common-issues-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.common-issue-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.issue-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.issue-name {
+    color: #333;
+    font-weight: 500;
+}
+
+.issue-severity {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.issue-severity.high {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.issue-severity.medium {
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.issue-severity.low {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.issue-count {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.dashboard-footer {
+    margin-top: 1rem;
+    text-align: center;
+    padding: 1rem;
+    background: white;
+    border-top: 1px solid #eee;
+    position: relative;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .sidebar {
+        width: calc(100vw - 2rem);
+        margin-left: 1rem;
+        height: auto;
+        position: static;
+        margin-bottom: 1rem;
+    }
+
+    .main {
+        width: 100%;
+        max-width: 100%;
+        padding: 0 1rem 2rem 1rem;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .vuln-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .url-form {
+        flex-direction: column;
+    }
+
+    .scan-button {
+        width: 100%;
+    }
+
+    .general-summary {
+        padding: 1.5rem;
+    }
+
+    .summary-content p {
+        font-size: 1rem;
+    }
+
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .summary-item {
+        padding: 0.8rem;
+    }
+
+    .summary-value {
+        font-size: 1rem;
+    }
+
+    .scan-summary-card {
+        padding: 1.5rem;
+    }
+
+    .scan-summary-section {
+        padding: 1rem;
+    }
+
+    .scan-info-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .common-issue-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .issue-count {
+        align-self: flex-end;
+    }
+
+    .vulnerabilities-list {
+        margin-bottom: 1rem;
+    }
 } 

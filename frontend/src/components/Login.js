@@ -18,31 +18,59 @@ const Login = ({ switchToRegister }) => {
     };
 
     return (
-        <div className="auth-container">
-            <h1>Login</h1>
-            <form onSubmit={handleLogin}>
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
-                <button type="submit">Login</button>
-            </form>
-            <p>
-                Don't have an account?{' '}
-                <a href="#" onClick={switchToRegister}>
-                    Register
-                </a>
-            </p>
+        <div className="login-container">
+            <div className="login-left">
+                <div className="login-left-content">
+                    <h1>Welcome to AIronSafe</h1>
+                    <p>Advanced Web Application Security Testing Tool</p>
+                    <div className="features">
+                        <div className="feature-item">
+                            <span className="feature-icon">🔍</span>
+                            <span>SAST Analysis</span>
+                        </div>
+                        <div className="feature-item">
+                            <span className="feature-icon">🌐</span>
+                            <span>DAST Testing</span>
+                        </div>
+                        <div className="feature-item">
+                            <span className="feature-icon">📊</span>
+                            <span>Detailed Reports</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className="login-right">
+                <div className="login-form-container">
+                    <h2>Login</h2>
+                    <form onSubmit={handleLogin}>
+                        <div className="form-group">
+                            <input
+                                type="email"
+                                placeholder="Email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <input
+                                type="password"
+                                placeholder="Password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
+                        </div>
+                        <button type="submit" className="login-button">Login</button>
+                    </form>
+                    <p className="register-link">
+                        Don't have an account?{' '}
+                        <a href="#" onClick={switchToRegister}>
+                            Register
+                        </a>
+                    </p>
+                </div>
+            </div>
         </div>
     );
 };

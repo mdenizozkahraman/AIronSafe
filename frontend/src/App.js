@@ -15,12 +15,12 @@ const App = () => {
 
   return (
     <Router>
-      <div style={styles.appContainer}>
-        <header style={styles.header}>
-          AIronSafe
+      <div className="app-container">
+        <header className="app-header">
+          <span className="navbar-logo">AIronSafe</span>
         </header>
 
-        <div style={styles.content}>
+        <div className="app-content">
           <Routes>
             <Route 
               path="/" 
@@ -36,47 +36,12 @@ const App = () => {
           </Routes>
         </div>
 
-        <footer style={styles.footer}>
+        <footer className="app-footer">
           © 2025 AIronSafe. All Rights Reserved.
         </footer>
       </div>
     </Router>
   );
-};
-
-const styles = {
-  appContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100vh'
-  },
-  header: {
-    backgroundColor: '#ffffff',
-    borderBottom: '1px solid #ddd',
-    padding: '1.5rem 0',
-    textAlign: 'center',
-    fontSize: '2rem',
-    fontWeight: 'bold',
-    color: '#4CAF50',
-    position: 'fixed',
-    width: '100%',
-    top: 0,
-    zIndex: 10
-  },
-  content: {
-    flexGrow: 1,
-    marginTop: '5rem',
-    overflowY: 'auto'
-  },
-  footer: {
-    textAlign: 'center',
-    padding: '1rem',
-    backgroundColor: '#f9f9f9',
-    borderTop: '1px solid #ddd',
-    position: 'fixed',
-    bottom: 0,
-    width: '100%'
-  }
 };
 
 export default App;
