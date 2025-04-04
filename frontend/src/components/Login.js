@@ -5,15 +5,37 @@ import '../styles/Login.css';
 const Login = ({ switchToRegister }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setError('');
 
-        if (email === 'admin@aironsafe.com' && password === 'admin') {
-            navigate('/dashboard');
-        } else {
-            alert('Invalid credentials');
+        try {
+            const response = await fetch('http://localhost:5000/api/users/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email,
+                    password
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Token'ı localStorage'a kaydet
+                localStorage.setItem('token', data.access_token);
+                navigate('/dashboard');
+            } else {
+                setError(data.message || 'Login failed');
+            }
+        } catch (err) {
+            setError('An error occurred. Please try again.');
+            console.error('Login error:', err);
         }
     };
 
@@ -42,6 +64,7 @@ const Login = ({ switchToRegister }) => {
             <div className="login-right">
                 <div className="login-form-container">
                     <h2>Login</h2>
+                    {error && <div className="error-message">{error}</div>}
                     <form onSubmit={handleLogin}>
                         <div className="form-group">
                             <input

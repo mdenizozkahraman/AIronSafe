@@ -3,23 +3,48 @@ import { register } from '../services/authService';
 import '../styles/Login.css';
 
 const Register = ({ switchToLogin }) => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    fullName: ''
+  });
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      alert('Passwords do not match');
+    setError('');
+    setSuccess('');
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
       return;
     }
-    const result = await register(username, email, password);
-    if (result.message === 'User created successfully') {
-      alert('Registration successful!');
-      switchToLogin();
-    } else {
-      alert(result.message);
+
+    try {
+      const result = await register(
+        formData.username,
+        formData.email,
+        formData.password,
+        formData.fullName
+      );
+      console.log('Registration result:', result);
+      setSuccess('Registration successful! Redirecting to login...');
+      setTimeout(() => {
+        switchToLogin();
+      }, 2000);
+    } catch (err) {
+      console.error('Registration error:', err);
+      setError(err.message || 'Registration failed. Please try again.');
     }
   };
 
@@ -48,40 +73,55 @@ const Register = ({ switchToLogin }) => {
       <div className="login-right">
         <div className="login-form-container">
           <h2>Create Account</h2>
+          {error && <div className="error-message">{error}</div>}
+          {success && <div className="success-message">{success}</div>}
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <input
                 type="text"
-                placeholder="Full Name"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                name="username"
+                placeholder="Username"
+                value={formData.username}
+                onChange={handleChange}
                 required
+              />
+            </div>
+            <div className="form-group">
+              <input
+                type="text"
+                name="fullName"
+                placeholder="Full Name"
+                value={formData.fullName}
+                onChange={handleChange}
               />
             </div>
             <div className="form-group">
               <input
                 type="email"
+                name="email"
                 placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={formData.email}
+                onChange={handleChange}
                 required
               />
             </div>
             <div className="form-group">
               <input
                 type="password"
+                name="password"
                 placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={formData.password}
+                onChange={handleChange}
                 required
               />
             </div>
             <div className="form-group">
               <input
                 type="password"
+                name="confirmPassword"
                 placeholder="Confirm Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                value={formData.confirmPassword}
+                onChange={handleChange}
                 required
               />
             </div>

@@ -1,17 +1,119 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import '../styles/Dashboard.css';
 
 const Dashboard = () => {
-    const handleActivityClick = (type, details) => {
-        // Bu fonksiyon ilgili sayfaya yönlendirme yapacak
-        console.log(`Clicked ${type}: ${details}`);
+    const [user, setUser] = useState(null);
+    const [todos, setTodos] = useState([]);
+    const [newTodo, setNewTodo] = useState('');
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            navigate('/');
+            return;
+        }
+
+        // Kullanıcı bilgilerini çek
+        fetch('http://localhost:5000/api/users/me', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to fetch user data');
+            return response.json();
+        })
+        .then(data => setUser(data))
+        .catch(err => {
+            console.error('Error fetching user data:', err);
+            setError('Failed to load user data');
+        });
+
+        // Todo'ları çek
+        fetch('http://localhost:5000/api/todos', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to fetch todos');
+            return response.json();
+        })
+        .then(data => setTodos(data))
+        .catch(err => {
+            console.error('Error fetching todos:', err);
+            setError('Failed to load todos');
+        });
+    }, [navigate]);
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        navigate('/');
+    };
+
+    const handleAddTodo = async (e) => {
+        e.preventDefault();
+        const token = localStorage.getItem('token');
+        
+        try {
+            const response = await fetch('http://localhost:5000/api/todos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    title: newTodo,
+                    description: ''
+                })
+            });
+
+            if (!response.ok) throw new Error('Failed to add todo');
+            
+            const newTodoItem = await response.json();
+            setTodos([...todos, newTodoItem]);
+            setNewTodo('');
+        } catch (err) {
+            console.error('Error adding todo:', err);
+            setError('Failed to add todo');
+        }
+    };
+
+    const handleToggleTodo = async (todoId) => {
+        const token = localStorage.getItem('token');
+        const todo = todos.find(t => t.id === todoId);
+        
+        try {
+            const response = await fetch(`http://localhost:5000/api/todos/${todoId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    completed: !todo.completed
+                })
+            });
+
+            if (!response.ok) throw new Error('Failed to update todo');
+            
+            setTodos(todos.map(t => 
+                t.id === todoId ? { ...t, completed: !t.completed } : t
+            ));
+        } catch (err) {
+            console.error('Error updating todo:', err);
+            setError('Failed to update todo');
+        }
     };
 
     return (
         <div className="dashboard-container">
             <header className="dashboard-header">
                 <span className="navbar-logo">AIronSafe</span>
+                {user && <span className="user-info">Welcome, {user.full_name}</span>}
             </header>
 
             <nav className="dashboard-nav">
@@ -21,68 +123,55 @@ const Dashboard = () => {
                     <Link to="/dast">DAST</Link>
                 </div>
                 <div>
-                    <Link to="/">Logout</Link>
+                    <button onClick={handleLogout} className="logout-button">Logout</button>
                 </div>
             </nav>
 
             <div className="container">
                 <div className="sidebar">
-                    <h3>Navigation</h3>
-                    <ul>
-                        <li>Overview</li>
-                        <li>Recent Scans</li>
-                        <li>Reports</li>
-                        <li>Settings</li>
-                    </ul>
+                    <div className="user-profile">
+                        <h3>Profile</h3>
+                        {user && (
+                            <div className="profile-info">
+                                <p><strong>Username:</strong> {user.username}</p>
+                                <p><strong>Email:</strong> {user.email}</p>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 <div className="main">
-                    <div className="stats">
-                        <div className="card">
-                            <h4>Total Scans</h4>
-                            <p>120</p>
-                        </div>
-                        <div className="card">
-                            <h4>Critical Issues</h4>
-                            <p>15</p>
-                        </div>
-                        <div className="card">
-                            <h4>Resolved Issues</h4>
-                            <p>105</p>
-                        </div>
-                    </div>
+                    <div className="todos-section">
+                        <h3>My Tasks</h3>
+                        {error && <div className="error-message">{error}</div>}
+                        
+                        <form onSubmit={handleAddTodo} className="add-todo-form">
+                            <input
+                                type="text"
+                                value={newTodo}
+                                onChange={(e) => setNewTodo(e.target.value)}
+                                placeholder="Add new task..."
+                                required
+                            />
+                            <button type="submit">Add</button>
+                        </form>
 
-                    <div className="activity-section">
-                        <div className="recent-activity-card">
-                            <h4>Recent Activity</h4>
-                            <div className="activity-list">
-                                <div className="activity-item" onClick={() => handleActivityClick('sast', 'file1.py')}>
-                                    <div className="activity-icon sast">🔍</div>
-                                    <div className="activity-content">
-                                        <h5>SAST Scan Completed</h5>
-                                        <p>file1.py</p>
-                                    </div>
-                                    <span className="activity-time">2 hours ago</span>
+                        <div className="todos-list">
+                            {todos.map(todo => (
+                                <div 
+                                    key={todo.id} 
+                                    className={`todo-item ${todo.completed ? 'completed' : ''}`}
+                                    onClick={() => handleToggleTodo(todo.id)}
+                                >
+                                    <span className="todo-checkbox">
+                                        {todo.completed ? '✓' : ''}
+                                    </span>
+                                    <span className="todo-title">{todo.title}</span>
+                                    <span className="todo-date">
+                                        {new Date(todo.created_at).toLocaleDateString()}
+                                    </span>
                                 </div>
-
-                                <div className="activity-item" onClick={() => handleActivityClick('dast', 'https://example.com')}>
-                                    <div className="activity-icon dast">🌐</div>
-                                    <div className="activity-content">
-                                        <h5>DAST Scan Completed</h5>
-                                        <p>https://example.com</p>
-                                    </div>
-                                    <span className="activity-time">3 hours ago</span>
-                                </div>
-
-                                <div className="activity-item" onClick={() => handleActivityClick('report', 'Report_01.pdf')}>
-                                    <div className="activity-icon report">📊</div>
-                                    <div className="activity-content">
-                                        <h5>Report Generated</h5>
-                                        <p>Report_01.pdf</p>
-                                    </div>
-                                    <span className="activity-time">5 hours ago</span>
-                                </div>
-                            </div>
+                            ))}
                         </div>
                     </div>
                 </div>
