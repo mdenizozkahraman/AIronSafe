@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { HiOutlineMail, HiOutlineArrowLeft, HiOutlinePaperAirplane } from 'react-icons/hi';
+import { HiOutlineMail, HiOutlineArrowLeft, HiOutlinePaperAirplane, HiOutlineLockClosed } from 'react-icons/hi';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -17,6 +18,7 @@ const ForgotPassword = () => {
     e.preventDefault();
     setError('');
     setSuccess(false);
+    setNewPassword('');
     
     if (!email) {
       setError('Please enter your email address');
@@ -25,16 +27,29 @@ const ForgotPassword = () => {
 
     setLoading(true);
     
-    // Simulate sending password reset email
-    setTimeout(() => {
-      setLoading(false);
-      setSuccess(true);
+    try {
+      const response = await fetch('http://localhost:5000/api/users/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email })
+      });
       
-      // In a real application, you would:
-      // 1. Send request to backend with email
-      // 2. Backend generates reset token and sends email
-      // 3. Show success message to user
-    }, 1500);
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to reset password');
+      }
+      
+      setSuccess(true);
+      setNewPassword(data.new_password);
+    } catch (err) {
+      console.error('Error resetting password:', err);
+      setError(err.message || 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -59,14 +74,24 @@ const ForgotPassword = () => {
           {success ? (
             <div className="space-y-6">
               <div className="p-4 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded-lg">
-                <p className="text-center">Password reset email sent! Please check your inbox for instructions to reset your password.</p>
+                <p className="text-center mb-2">Your password has been reset successfully!</p>
+                {newPassword && (
+                  <div className="mt-4">
+                    <p className="text-center font-semibold mb-1">Your new password is:</p>
+                    <div className="flex items-center justify-center space-x-2 bg-white dark:bg-gray-700 p-3 rounded-lg border border-green-200 dark:border-green-900">
+                      <HiOutlineLockClosed className="text-green-600 dark:text-green-400" />
+                      <span className="font-mono text-lg">{newPassword}</span>
+                    </div>
+                    <p className="text-xs text-center mt-2">Please use this password to log in and change it immediately for security reasons.</p>
+                  </div>
+                )}
               </div>
               <button
                 onClick={() => navigate('/login')}
                 className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors dark:bg-green-700 dark:hover:bg-green-800"
               >
                 <HiOutlineArrowLeft className="mr-2 h-5 w-5" />
-                Back to Sign In
+                Go to Sign In
               </button>
             </div>
           ) : (
@@ -92,7 +117,7 @@ const ForgotPassword = () => {
                   />
                 </div>
                 <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                  Enter the email address associated with your account, and we'll send you a link to reset your password.
+                  Enter the email address associated with your account, and we'll generate a new password for you.
                 </p>
               </div>
 
@@ -110,12 +135,12 @@ const ForgotPassword = () => {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      Sending...
+                      Processing...
                     </>
                   ) : (
                     <>
                       <HiOutlinePaperAirplane className="mr-2 h-5 w-5" />
-                      Send Reset Link
+                      Reset Password
                     </>
                   )}
                 </button>

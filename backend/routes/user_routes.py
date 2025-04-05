@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from models.user import User
 from __init__ import db
+import random
 
 user_bp = Blueprint('user_bp', __name__)
 
@@ -182,4 +183,30 @@ def get_all_users():
         }), 200
     except Exception as e:
         print(f"Error fetching users: {str(e)}")
-        return jsonify({'message': 'Error fetching users', 'error': str(e)}), 500 
+        return jsonify({'message': 'Error fetching users', 'error': str(e)}), 500
+
+# Forgot Password - Rastgele 8 haneli şifre üreten endpoint
+@user_bp.route('/forgot-password', methods=['POST'])
+def forgot_password():
+    data = request.get_json()
+    
+    if not data or 'email' not in data:
+        return jsonify({'message': 'Email is required'}), 400
+    
+    user = User.query.filter_by(email=data['email']).first()
+    
+    if not user:
+        return jsonify({'message': 'No user found with this email address'}), 404
+    
+    # Rastgele 8 haneli sayı üret
+    new_password = ''.join([str(random.randint(0, 9)) for _ in range(8)])
+    
+    # Kullanıcının şifresini güncelle
+    user.set_password(new_password)
+    db.session.commit()
+    
+    # Test için şimdilik şifreyi doğrudan dön
+    return jsonify({
+        'message': 'Password has been reset successfully',
+        'new_password': new_password  # Production'da bu kaldırılmalı
+    }), 200 
