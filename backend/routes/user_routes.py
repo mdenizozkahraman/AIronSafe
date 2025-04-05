@@ -158,4 +158,28 @@ def simple_change_password():
     user.set_password(data['new_password'])
     db.session.commit()
     
-    return jsonify({'message': 'Password updated successfully'}), 200 
+    return jsonify({'message': 'Password updated successfully'}), 200
+
+# Admin Endpoint - Tüm kullanıcıları listeleme
+@user_bp.route('/admin/all-users', methods=['GET'])
+def get_all_users():
+    # Bu endpoint'i production'da kullanmadan önce admin kimlik doğrulaması ekleyin
+    try:
+        users = User.query.all()
+        user_list = []
+        
+        for user in users:
+            user_list.append({
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'full_name': user.full_name
+            })
+        
+        return jsonify({
+            'count': len(user_list),
+            'users': user_list
+        }), 200
+    except Exception as e:
+        print(f"Error fetching users: {str(e)}")
+        return jsonify({'message': 'Error fetching users', 'error': str(e)}), 500 
