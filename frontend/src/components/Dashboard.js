@@ -1,183 +1,66 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import '../styles/Dashboard.css';
+import React from 'react';
 
 const Dashboard = () => {
-    const [user, setUser] = useState(null);
-    const [todos, setTodos] = useState([]);
-    const [newTodo, setNewTodo] = useState('');
-    const [error, setError] = useState('');
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            navigate('/');
-            return;
-        }
-
-        // Kullanıcı bilgilerini çek
-        fetch('http://localhost:5000/api/users/me', {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        })
-        .then(response => {
-            if (!response.ok) throw new Error('Failed to fetch user data');
-            return response.json();
-        })
-        .then(data => setUser(data))
-        .catch(err => {
-            console.error('Error fetching user data:', err);
-            setError('Failed to load user data');
-        });
-
-        // Todo'ları çek
-        fetch('http://localhost:5000/api/todos', {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        })
-        .then(response => {
-            if (!response.ok) throw new Error('Failed to fetch todos');
-            return response.json();
-        })
-        .then(data => setTodos(data))
-        .catch(err => {
-            console.error('Error fetching todos:', err);
-            setError('Failed to load todos');
-        });
-    }, [navigate]);
-
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        navigate('/');
-    };
-
-    const handleAddTodo = async (e) => {
-        e.preventDefault();
-        const token = localStorage.getItem('token');
-        
-        try {
-            const response = await fetch('http://localhost:5000/api/todos', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    title: newTodo,
-                    description: ''
-                })
-            });
-
-            if (!response.ok) throw new Error('Failed to add todo');
-            
-            const newTodoItem = await response.json();
-            setTodos([...todos, newTodoItem]);
-            setNewTodo('');
-        } catch (err) {
-            console.error('Error adding todo:', err);
-            setError('Failed to add todo');
-        }
-    };
-
-    const handleToggleTodo = async (todoId) => {
-        const token = localStorage.getItem('token');
-        const todo = todos.find(t => t.id === todoId);
-        
-        try {
-            const response = await fetch(`http://localhost:5000/api/todos/${todoId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    completed: !todo.completed
-                })
-            });
-
-            if (!response.ok) throw new Error('Failed to update todo');
-            
-            setTodos(todos.map(t => 
-                t.id === todoId ? { ...t, completed: !t.completed } : t
-            ));
-        } catch (err) {
-            console.error('Error updating todo:', err);
-            setError('Failed to update todo');
-        }
-    };
-
-    return (
-        <div className="dashboard-container">
-            <header className="dashboard-header">
-                <span className="navbar-logo">AIronSafe</span>
-                {user && <span className="user-info">Welcome, {user.full_name}</span>}
-            </header>
-
-            <nav className="dashboard-nav">
-                <div className="dashboard-nav-links">
-                    <Link to="/dashboard">Dashboard</Link>
-                    <Link to="/sast">SAST</Link>
-                    <Link to="/dast">DAST</Link>
-                </div>
-                <div>
-                    <button onClick={handleLogout} className="logout-button">Logout</button>
-                </div>
-            </nav>
-
-            <div className="container">
-                <div className="sidebar">
-                    <div className="user-profile">
-                        <h3>Profile</h3>
-                        {user && (
-                            <div className="profile-info">
-                                <p><strong>Username:</strong> {user.username}</p>
-                                <p><strong>Email:</strong> {user.email}</p>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                <div className="main">
-                    <div className="todos-section">
-                        <h3>My Tasks</h3>
-                        {error && <div className="error-message">{error}</div>}
-                        
-                        <form onSubmit={handleAddTodo} className="add-todo-form">
-                            <input
-                                type="text"
-                                value={newTodo}
-                                onChange={(e) => setNewTodo(e.target.value)}
-                                placeholder="Add new task..."
-                                required
-                            />
-                            <button type="submit">Add</button>
-                        </form>
-
-                        <div className="todos-list">
-                            {todos.map(todo => (
-                                <div 
-                                    key={todo.id} 
-                                    className={`todo-item ${todo.completed ? 'completed' : ''}`}
-                                    onClick={() => handleToggleTodo(todo.id)}
-                                >
-                                    <span className="todo-checkbox">
-                                        {todo.completed ? '✓' : ''}
-                                    </span>
-                                    <span className="todo-title">{todo.title}</span>
-                                    <span className="todo-date">
-                                        {new Date(todo.created_at).toLocaleDateString()}
-                                    </span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </div>
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md flex flex-col items-center">
+          <span className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-2">24</span>
+          <span className="text-gray-600 dark:text-gray-400">Total Scans</span>
         </div>
-    );
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md flex flex-col items-center">
+          <span className="text-2xl font-bold text-red-600 dark:text-red-400 mb-2">5</span>
+          <span className="text-gray-600 dark:text-gray-400">Critical Issues</span>
+        </div>
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md flex flex-col items-center">
+          <span className="text-2xl font-bold text-green-600 dark:text-green-400 mb-2">12</span>
+          <span className="text-gray-600 dark:text-gray-400">Resolved Issues</span>
+        </div>
+      </div>
+      
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+        <h2 className="text-lg font-semibold mb-4">Recent Activity</h2>
+        <div className="space-y-2">
+          <div className="p-3 bg-gray-50 dark:bg-gray-700/30 rounded-lg">
+            <p className="text-sm">SAST scan completed for frontend-code.zip</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Today, 10:30 AM</p>
+          </div>
+          <div className="p-3 bg-gray-50 dark:bg-gray-700/30 rounded-lg">
+            <p className="text-sm">DAST scan started for https://example.com</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Yesterday, 3:45 PM</p>
+          </div>
+        </div>
+      </div>
+      
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+        <h2 className="text-lg font-semibold mb-4">Scan History</h2>
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-left border-b border-gray-200 dark:border-gray-700">
+              <th className="py-2">Type</th>
+              <th className="py-2">Target</th>
+              <th className="py-2">Date</th>
+              <th className="py-2">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="border-b border-gray-100 dark:border-gray-800">
+              <td className="py-2">SAST</td>
+              <td className="py-2">frontend-code.zip</td>
+              <td className="py-2">15 Eyl 2023</td>
+              <td className="py-2"><span className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 px-2 py-1 rounded text-xs">Completed</span></td>
+            </tr>
+            <tr>
+              <td className="py-2">DAST</td>
+              <td className="py-2">https://example.com</td>
+              <td className="py-2">14 Eyl 2023</td>
+              <td className="py-2"><span className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 px-2 py-1 rounded text-xs">In Progress</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 };
 
 export default Dashboard;

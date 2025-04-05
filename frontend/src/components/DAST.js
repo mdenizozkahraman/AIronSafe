@@ -1,168 +1,118 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import '../styles/DAST.css';
+import { HiOutlineSearch } from 'react-icons/hi';
 
 const DAST = () => {
   const [url, setUrl] = useState('');
   const [scanning, setScanning] = useState(false);
-  const [results, setResults] = useState(null);
 
-  const handleScan = async () => {
-    if (!url) {
-      alert('Please enter a URL first');
+  const handleUrlChange = (e) => {
+    setUrl(e.target.value);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!url) return;
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      alert('Please enter a valid URL starting with http:// or https://');
       return;
     }
 
     setScanning(true);
+    
+    // Simulate scan process
     setTimeout(() => {
       setScanning(false);
-      setResults({
-        vulnerabilities: [
-          { type: 'SQL Injection', severity: 'High', count: 1 },
-          { type: 'Cross-Site Scripting (XSS)', severity: 'High', count: 2 },
-          { type: 'Cross-Site Request Forgery', severity: 'Medium', count: 3 },
-          { type: 'Information Disclosure', severity: 'Medium', count: 2 },
-          { type: 'Missing Security Headers', severity: 'Low', count: 4 },
-          { type: 'Cookie Security', severity: 'Low', count: 2 }
-        ],
-        totalIssues: 14,
-        scanTime: '5 minutes 45 seconds',
-        targetUrl: url
-      });
+      setUrl('');
+      
+      // Here you would actually send the URL to your backend
+      alert('Scan started for: ' + url);
     }, 2000);
   };
 
   return (
-    <div className="dashboard-container">
-      <header className="dashboard-header">
-        <span className="navbar-logo">AIronSafe</span>
-      </header>
+    <div className="space-y-6">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+        <h2 className="text-lg font-semibold mb-4">Start New DAST Scan</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="text"
+            value={url}
+            onChange={handleUrlChange}
+            placeholder="https://example.com"
+            className="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition-colors duration-200"
+          />
+          <button
+            type="submit"
+            disabled={!url || scanning}
+            className={`w-full py-3 px-4 flex justify-center items-center rounded-lg font-medium text-white
+              ${!url || scanning ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800'}
+              transition-colors duration-200`}
+          >
+            {scanning ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Scanning...
+              </>
+            ) : (
+              <>
+                <HiOutlineSearch className="mr-2 h-5 w-5" />
+                Start Scan
+              </>
+            )}
+          </button>
+        </form>
+      </div>
 
-      <nav className="dashboard-nav">
-        <div>
-          <Link to="/dashboard">Dashboard</Link>
-          <Link to="/sast">SAST</Link>
-          <Link to="/dast" className="active">DAST</Link>
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold">DAST Scan History</h2>
+          <button className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded transition-colors">
+            📄 Download Report
+          </button>
         </div>
-        <div>
-          <Link to="/">Logout</Link>
+        <div className="mb-4">
+          <input 
+            type="text" 
+            placeholder="Search by URL..." 
+            className="w-full p-2 rounded bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
         </div>
-      </nav>
-
-      <div className="container">
-        <div className="sidebar">
-          <h3>DAST Analysis</h3>
-          <ul>
-            <li>New Scan</li>
-            <li>Scan History</li>
-            <li>Configuration</li>
-            <li>Reports</li>
-          </ul>
-        </div>
-
-        <div className="main">
-          <div className="scan-section">
-            <div className="url-input-box">
-              <h2>Dynamic Application Security Testing</h2>
-              <p>Enter the URL of your web application for security analysis</p>
-              <div className="url-form">
-                <input
-                  type="url"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  placeholder="example.com"
-                  className="url-field"
-                />
-                <button 
-                  onClick={handleScan}
-                  disabled={scanning || !url}
-                  className="scan-button"
-                >
-                  {scanning ? 'Scanning...' : 'Start Scan'}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {results && (
-            <>
-              <div className="scan-summary-card">
-                <h4>Scan Summary</h4>
-                <div className="scan-summary-content">
-                  <div className="scan-summary-section">
-                    <h5>Target Information</h5>
-                    <div className="scan-info-grid">
-                      <div className="info-item">
-                        <span className="info-label">Target URL</span>
-                        <span className="info-value">{results.targetUrl}</span>
-                      </div>
-                      <div className="info-item">
-                        <span className="info-label">Scan Duration</span>
-                        <span className="info-value">{results.scanTime}</span>
-                      </div>
-                      <div className="info-item">
-                        <span className="info-label">Scan Status</span>
-                        <span className="info-value status-complete">Completed</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="scan-summary-section">
-                    <h5>Vulnerability Overview</h5>
-                    <div className="scan-info-grid">
-                      <div className="info-item">
-                        <span className="info-label">Total Issues</span>
-                        <span className="info-value highlight">{results.totalIssues}</span>
-                      </div>
-                      <div className="info-item">
-                        <span className="info-label">High Severity</span>
-                        <span className="info-value high">{results.vulnerabilities.filter(v => v.severity === 'High').reduce((acc, v) => acc + v.count, 0)}</span>
-                      </div>
-                      <div className="info-item">
-                        <span className="info-label">Medium Severity</span>
-                        <span className="info-value medium">{results.vulnerabilities.filter(v => v.severity === 'Medium').reduce((acc, v) => acc + v.count, 0)}</span>
-                      </div>
-                      <div className="info-item">
-                        <span className="info-label">Low Severity</span>
-                        <span className="info-value low">{results.vulnerabilities.filter(v => v.severity === 'Low').reduce((acc, v) => acc + v.count, 0)}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="scan-summary-section">
-                    <h5>Most Common Issues</h5>
-                    <div className="common-issues-list">
-                      {results.vulnerabilities
-                        .sort((a, b) => b.count - a.count)
-                        .slice(0, 3)
-                        .map((vuln, index) => (
-                          <div key={index} className="common-issue-item">
-                            <div className="issue-info">
-                              <span className="issue-name">{vuln.type}</span>
-                              <span className={`issue-severity ${vuln.severity.toLowerCase()}`}>{vuln.severity}</span>
-                            </div>
-                            <span className="issue-count">{vuln.count} instances</span>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="vulnerabilities-list">
-                <h4>Detected Vulnerabilities</h4>
-                <div className="vuln-grid">
-                  {results.vulnerabilities.map((vuln, index) => (
-                    <div key={index} className={`vuln-card ${vuln.severity.toLowerCase()}`}>
-                      <h3>{vuln.type}</h3>
-                      <p className="severity">Severity: {vuln.severity}</p>
-                      <p className="count">Found: {vuln.count}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </>
-          )}
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left border-b border-gray-200 dark:border-gray-700">
+                <th className="py-3 pr-6">URL</th>
+                <th className="py-3 pr-6">Date</th>
+                <th className="py-3 pr-6">Status</th>
+                <th className="py-3">CVSS</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y dark:divide-gray-700">
+              <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/60">
+                <td className="py-3 pr-6">https://example.com</td>
+                <td className="py-3 pr-6">14 Eyl 2023</td>
+                <td className="py-3 pr-6">
+                  <span className="text-green-500 dark:text-green-400">Completed</span>
+                </td>
+                <td className="py-3">
+                  <span className="bg-red-600 text-white px-2 py-1 rounded text-xs">9.1</span>
+                </td>
+              </tr>
+              <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/60">
+                <td className="py-3 pr-6">https://staging.site</td>
+                <td className="py-3 pr-6">10 Eyl 2023</td>
+                <td className="py-3 pr-6">
+                  <span className="text-red-500 dark:text-red-400">Failed</span>
+                </td>
+                <td className="py-3">
+                  <span className="bg-gray-600 text-white px-2 py-1 rounded text-xs">—</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
