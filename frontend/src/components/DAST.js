@@ -135,9 +135,9 @@ const DAST = () => {
       console.error('Error downloading report:', err);
       setError('Failed to download report: ' + err.message);
     }
-  };
+    };
 
-  return (
+    return (
     <div className="space-y-6">
       {error && (
         <div className="p-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-lg flex items-center">
@@ -206,8 +206,8 @@ const DAST = () => {
             <div className="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-lg text-center">
               <span className="block text-2xl font-bold text-gray-700 dark:text-gray-400">{scanResults.summary.info_alerts}</span>
               <span className="text-sm text-gray-600 dark:text-gray-400">Info</span>
-            </div>
-          </div>
+                </div>
+                </div>
           
           <h3 className="text-md font-semibold mb-3">Detected Vulnerabilities</h3>
           <div className="space-y-3">
@@ -228,7 +228,7 @@ const DAST = () => {
                   </div>
                   {expandedAlert === index ? <HiChevronUp className="h-5 w-5" /> : <HiChevronDown className="h-5 w-5" />}
                 </div>
-                
+
                 {expandedAlert === index && (
                   <div className="p-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -320,8 +320,8 @@ const DAST = () => {
                             title="Download JSON Report"
                           >
                             <HiOutlineDownload className="h-5 w-5" />
-                          </button>
-                        </div>
+                    </button>
+                </div>
                       )}
                     </td>
                   </tr>
@@ -337,8 +337,8 @@ const DAST = () => {
           </table>
         </div>
       </div>
-    </div>
-  );
+        </div>
+    );
 };
 
 export default DAST;

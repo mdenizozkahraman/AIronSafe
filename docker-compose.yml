@@ -1,55 +1,55 @@
-version: '3.8'
+version: "3"
 
 services:
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend:/app
     ports:
       - "5000:5000"
+    depends_on:
+      - db
+    networks:
+      - app-network
+    restart: unless-stopped
     environment:
       - FLASK_APP=app.py
       - FLASK_ENV=development
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/aironsafek
-    depends_on:
-      - db
-    volumes:
-      - ./backend:/app
-    command: flask run --host=0.0.0.0
-    networks:
-      - app-network
+      - FLASK_DEBUG=1
+      - DATABASE_URL=postgresql://postgres:postgres@db/aironsafek
 
   db:
-    image: postgres:13
     container_name: aironsafe-db
-    ports:
-      - "5432:5432"
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=aironsafek
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d aironsafek"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    ports:
+      - "5432:5432"
     networks:
       - app-network
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
 
   frontend:
-    build: ./frontend
     container_name: aironsafe-frontend
-    ports:
-      - "3000:3000"
-    environment:
-      - REACT_APP_API_URL=http://localhost:5000
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     volumes:
       - ./frontend:/app
       - /app/node_modules
+    ports:
+      - "3000:3000"
     depends_on:
       - backend
     networks:
       - app-network
+    restart: unless-stopped
 
 volumes:
   postgres_data:
