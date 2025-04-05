@@ -47,13 +47,13 @@ const Dashboard = () => {
             <tr className="border-b border-gray-100 dark:border-gray-800">
               <td className="py-2">SAST</td>
               <td className="py-2">frontend-code.zip</td>
-              <td className="py-2">15 Eyl 2023</td>
+              <td className="py-2">15 September 2023</td>
               <td className="py-2"><span className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 px-2 py-1 rounded text-xs">Completed</span></td>
             </tr>
             <tr>
               <td className="py-2">DAST</td>
               <td className="py-2">https://example.com</td>
-              <td className="py-2">14 Eyl 2023</td>
+              <td className="py-2">14 August 2023</td>
               <td className="py-2"><span className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 px-2 py-1 rounded text-xs">In Progress</span></td>
             </tr>
           </tbody>

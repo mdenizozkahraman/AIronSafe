@@ -93,7 +93,7 @@ const DAST = () => {
             <tbody className="divide-y dark:divide-gray-700">
               <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/60">
                 <td className="py-3 pr-6">https://example.com</td>
-                <td className="py-3 pr-6">14 Eyl 2023</td>
+                <td className="py-3 pr-6">14 September 2023</td>
                 <td className="py-3 pr-6">
                   <span className="text-green-500 dark:text-green-400">Completed</span>
                 </td>
@@ -103,7 +103,7 @@ const DAST = () => {
               </tr>
               <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/60">
                 <td className="py-3 pr-6">https://staging.site</td>
-                <td className="py-3 pr-6">10 Eyl 2023</td>
+                <td className="py-3 pr-6">10 May 2023</td>
                 <td className="py-3 pr-6">
                   <span className="text-red-500 dark:text-red-400">Failed</span>
                 </td>

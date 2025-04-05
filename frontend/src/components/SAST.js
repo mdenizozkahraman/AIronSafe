@@ -112,7 +112,7 @@ const SAST = () => {
             <tbody className="divide-y dark:divide-gray-700">
               <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/60">
                 <td className="py-3 pr-6">frontend-code.zip</td>
-                <td className="py-3 pr-6">15 Eyl 2023</td>
+                <td className="py-3 pr-6">15 September 2023</td>
                 <td className="py-3 pr-6">
                   <span className="text-green-500 dark:text-green-400">Completed</span>
                 </td>
@@ -122,7 +122,7 @@ const SAST = () => {
               </tr>
               <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/60">
                 <td className="py-3 pr-6">mobile-app.js</td>
-                <td className="py-3 pr-6">12 Eyl 2023</td>
+                <td className="py-3 pr-6">12 July 2023</td>
                 <td className="py-3 pr-6">
                   <span className="text-yellow-500 dark:text-yellow-400">Pending</span>
                 </td>

@@ -11,13 +11,13 @@ const Login = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  // Debug amacıyla authentication durumunu kontrol et
+  // Check authentication status for debugging
   useEffect(() => {
     const token = localStorage.getItem('token');
-    console.log('Component yüklendiğinde token:', token);
+    console.log('Token when component loads:', token);
     
     if (token) {
-      console.log('Token var, otomatik olarak dashboard\'a yönlendirilecek');
+      console.log('Token exists, automatically redirecting to dashboard');
       // Redirect to dashboard with a delay to avoid potential race conditions
       setTimeout(() => {
         navigate('/dashboard');
@@ -43,7 +43,7 @@ const Login = () => {
     }
 
     setLoading(true);
-    console.log('Giriş isteği gönderiliyor...');
+    console.log('Sending login request...');
     
     try {
       const response = await fetch('http://localhost:5000/api/users/login', {
@@ -64,7 +64,7 @@ const Login = () => {
         throw new Error(data.message || 'Login failed');
       }
       
-      console.log('Login başarılı, yanıt:', data);
+      console.log('Login successful, response:', data);
       
       // Store the token and user data, then navigate to dashboard
       const token = data.access_token;
@@ -83,11 +83,11 @@ const Login = () => {
       
       // Save user information
       if (data.user) {
-        console.log('Kullanıcı bilgileri alındı:', data.user);
+        console.log('User information received:', data.user);
         localStorage.setItem('user', JSON.stringify(data.user));
       }
       
-      console.log('Veriler localStorage\'a kaydedildi, dashboard\'a yönlendiriliyor...');
+      console.log('Data saved to localStorage, redirecting to dashboard...');
       
       // Navigate with a slight delay to ensure localStorage is updated
       setTimeout(() => {

@@ -163,7 +163,7 @@ const Profile = () => {
     }
 
     try {
-      // Kullanıcı bilgilerini al
+      // Get user information
       const userStr = localStorage.getItem('user');
       if (!userStr) {
         setPasswordError('User information not found. Please log in again.');
@@ -171,9 +171,9 @@ const Profile = () => {
       }
       
       const user = JSON.parse(userStr);
-      console.log('Kullanıcı bilgileri:', user);
+      console.log('User information:', user);
       
-      // Token sorunlarından bağımsız basit şifre değiştirme endpoint'i kullan
+      // Use simple password change endpoint independent of token issues
       const response = await fetch('http://localhost:5000/api/users/simple-change-password', {
         method: 'POST',
         headers: {

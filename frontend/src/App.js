@@ -35,15 +35,15 @@ function App() {
   }, [darkMode]);
 
   useEffect(() => {
-    // Güncel authentication durumunu kontrol et
+    // Check current authentication status
     const checkAuth = () => {
       setIsAuthenticated(!!localStorage.getItem('token'));
     };
     
-    // Sayfa yüklendiğinde kontrol et
+    // Check when page loads
     checkAuth();
     
-    // localStorage değişikliklerini dinle
+    // Listen for localStorage changes
     window.addEventListener('storage', checkAuth);
     
     return () => {

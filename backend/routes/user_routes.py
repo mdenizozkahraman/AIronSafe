@@ -57,17 +57,16 @@ def login():
 @user_bp.route('/me', methods=['GET'])
 @jwt_required()
 def get_user():
+    # Check user identity from token
+    current_user_id = get_jwt_identity()
+    
     try:
-        current_user_id = get_jwt_identity()
-        print(f"JWT Identity: {current_user_id}")
-        
-        user = User.query.get(current_user_id)
+        # Find the user
+        user = User.query.filter_by(id=current_user_id).first()
         
         if not user:
-            print(f"User not found with ID: {current_user_id}")
             return jsonify({'message': 'User not found'}), 404
             
-        print(f"User found: {user.username}")
         return jsonify({
             'id': user.id,
             'username': user.username,
@@ -75,8 +74,8 @@ def get_user():
             'full_name': user.full_name
         }), 200
     except Exception as e:
-        print(f"Error in /me endpoint: {str(e)}")
-        return jsonify({'message': 'Authentication error', 'error': str(e)}), 401
+        print(f"Error retrieving user: {str(e)}")
+        return jsonify({'message': 'Error retrieving user data', 'error': str(e)}), 500
 
 @user_bp.route('/update', methods=['PUT'])
 @jwt_required()
@@ -161,7 +160,7 @@ def simple_change_password():
     
     return jsonify({'message': 'Password updated successfully'}), 200
 
-# Admin Endpoint - Tüm kullanıcıları listeleme
+# Admin Endpoint - List all users
 @user_bp.route('/admin/all-users', methods=['GET'])
 def get_all_users():
     # Bu endpoint'i production'da kullanmadan önce admin kimlik doğrulaması ekleyin

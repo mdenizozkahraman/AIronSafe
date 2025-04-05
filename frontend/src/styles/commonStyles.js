@@ -40,12 +40,12 @@ export const commonStyles = {
     },
     content: {
         display: 'flex',
-        marginTop: '8rem', // Header + Navbar yüksekliği kadar boşluk bırakıyoruz
+        marginTop: '8rem', // Leave space equivalent to Header + Navbar height
         height: 'calc(100vh - 8rem)',
-        width: '100vw', // Tüm genişliği kaplasın
+        width: '100vw', // Cover the full width
     },
     sidebar: {
-        width: '18%', // Sidebar genişliğini sabit tutuyoruz
+        width: '18%', // Keep sidebar width fixed
         backgroundColor: '#f9f9f9',
         padding: '1.5rem',
         borderRight: '1px solid #ddd',
@@ -53,8 +53,8 @@ export const commonStyles = {
         boxSizing: 'border-box',
     },
     main: {
-        flexGrow: 1, // Kalan tüm alanı kaplasın
-        width: '82%', // Sidebar ile tam orantılı genişlik
+        flexGrow: 1, // Fill all remaining space
+        width: '82%', // Width proportional to sidebar
         padding: '2rem',
         backgroundColor: '#ffffff',
         overflowY: 'auto',
