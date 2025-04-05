@@ -7,7 +7,6 @@ const Profile = () => {
     email: ''
   });
   const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
@@ -97,7 +96,6 @@ const Profile = () => {
     setPasswordError('');
     setPasswordUpdateSuccess(false);
     setPasswordData({
-      currentPassword: '',
       newPassword: '',
       confirmPassword: ''
     });
@@ -205,7 +203,6 @@ const Profile = () => {
           setPasswordUpdateSuccess(true);
           setIsChangingPassword(false);
           setPasswordData({
-            currentPassword: '',
             newPassword: '',
             confirmPassword: ''
           });
@@ -221,7 +218,6 @@ const Profile = () => {
       setPasswordUpdateSuccess(true);
       setIsChangingPassword(false);
       setPasswordData({
-        currentPassword: '',
         newPassword: '',
         confirmPassword: ''
       });
@@ -367,21 +363,6 @@ const Profile = () => {
 
         {isChangingPassword ? (
           <form onSubmit={handlePasswordSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Current Password
-              </label>
-              <input
-                type="password"
-                id="currentPassword"
-                name="currentPassword"
-                value={passwordData.currentPassword}
-                onChange={handlePasswordDataChange}
-                className="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white transition-colors duration-200"
-                required
-              />
-            </div>
-
             <div>
               <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 New Password
