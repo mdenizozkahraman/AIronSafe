@@ -49,9 +49,11 @@ def create_app(test_config=None):
     # Yeni blueprintleri kaydet
     from routes.auth_routes import auth_bp
     from routes.dast_routes import dast_bp
+    from routes.sast_routes import sast_bp
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(dast_bp, url_prefix='/api/dast')
+    app.register_blueprint(sast_bp, url_prefix='/api/sast')
 
     # Veritabanını oluştur
     with app.app_context():

@@ -1,30 +1,139 @@
-import React, { useState } from 'react';
-import { HiOutlineUpload } from 'react-icons/hi';
+import React, { useState, useEffect } from 'react';
+import { HiOutlineUpload, HiOutlineExclamationCircle, HiOutlineInformationCircle, HiChevronDown, HiChevronUp, HiOutlineDownload, HiOutlineDocumentText } from 'react-icons/hi';
 
 const SAST = () => {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [scanResults, setScanResults] = useState(null);
+  const [scanHistory, setScanHistory] = useState([]);
+  const [error, setError] = useState('');
+  const [expandedVulnerability, setExpandedVulnerability] = useState(null);
+  const [filterKeyword, setFilterKeyword] = useState('');
+
+  // Fetch scan history when component mounts
+  useEffect(() => {
+    fetchScanHistory();
+  }, []);
+
+  const fetchScanHistory = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/sast/scan_history');
+      const data = await response.json();
+      
+      if (response.ok) {
+        setScanHistory(data.history);
+      } else {
+        console.error('Failed to fetch scan history:', data.message);
+        setError('Failed to fetch scan history');
+      }
+    } catch (err) {
+      console.error('Error fetching scan history:', err);
+      setError('Error connecting to server');
+    }
+  };
 
   const handleFileChange = (e) => {
     if (e.target.files[0]) {
       setFile(e.target.files[0]);
+      setScanResults(null);
+      setError('');
     }
   };
 
-  const handleFileUpload = (e) => {
+  const handleFileUpload = async (e) => {
     e.preventDefault();
     if (!file) return;
 
     setUploading(true);
+    setError('');
+    setScanResults(null);
     
-    // Simulate upload process
-    setTimeout(() => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await fetch('http://localhost:5000/api/sast/upload', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setScanResults(data.results);
+        // Refresh scan history after successful scan
+        fetchScanHistory();
+      } else {
+        setError(data.message || 'Failed to analyze file');
+      }
+    } catch (err) {
+      console.error('Error uploading file:', err);
+      setError('Error connecting to server');
+    } finally {
       setUploading(false);
       setFile(null);
-      // Here you would actually send the file to your backend
-      alert('File uploaded successfully! Scan started.');
-    }, 2000);
+    }
   };
+
+  const toggleVulnerability = (id) => {
+    setExpandedVulnerability(expandedVulnerability === id ? null : id);
+  };
+
+  const downloadReport = async (scanId, format = 'json') => {
+    try {
+      setError('');
+      
+      if (format === 'pdf' || format === 'html') {
+        // For PDF and HTML, open in a new tab to trigger browser download
+        window.open(`http://localhost:5000/api/sast/report/${scanId}?format=${format}`, '_blank');
+        return;
+      }
+      
+      // For JSON format
+      const response = await fetch(`http://localhost:5000/api/sast/report/${scanId}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to download report');
+      }
+      
+      const reportData = await response.json();
+      const reportStr = JSON.stringify(reportData, null, 2);
+      
+      const blob = new Blob([reportStr], { type: 'application/json' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `sast_report_${scanId}.json`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+    } catch (err) {
+      console.error('Error downloading report:', err);
+      setError('Failed to download report: ' + err.message);
+    }
+  };
+
+  // Get appropriate color classes based on severity
+  const getSeverityClass = (severity) => {
+    switch (severity) {
+      case 'high':
+        return 'bg-red-600 text-white';
+      case 'medium':
+        return 'bg-yellow-500 text-white';
+      case 'low':
+        return 'bg-blue-500 text-white';
+      default:
+        return 'bg-gray-500 text-white';
+    }
+  };
+
+  // Filter scan history based on search term
+  const filteredHistory = scanHistory.filter(scan => 
+    scan.filename.toLowerCase().includes(filterKeyword.toLowerCase())
+  );
 
   return (
     <div className="space-y-6">
@@ -85,18 +194,107 @@ const SAST = () => {
         </form>
       </div>
 
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded dark:bg-red-900/20 dark:text-red-400 dark:border-red-800">
+          <div className="flex items-center">
+            <HiOutlineExclamationCircle className="h-5 w-5 mr-2" />
+            <span>{error}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Scan Results */}
+      {scanResults && (
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+          <h2 className="text-lg font-semibold mb-4">Scan Results</h2>
+          
+          <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-red-100 dark:bg-red-900/20 p-4 rounded-lg text-center">
+              <span className="block text-3xl font-bold text-red-600 dark:text-red-400">
+                {scanResults.summary.high}
+              </span>
+            </div>
+            <div className="bg-yellow-100 dark:bg-yellow-900/20 p-4 rounded-lg text-center">
+              <span className="block text-3xl font-bold text-yellow-600 dark:text-yellow-400">
+                {scanResults.summary.medium}
+              </span>
+            </div>
+            <div className="bg-blue-100 dark:bg-blue-900/20 p-4 rounded-lg text-center">
+              <span className="block text-3xl font-bold text-blue-600 dark:text-blue-400">
+                {scanResults.summary.low}
+              </span>
+            </div>
+          </div>
+          
+          <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Vulnerabilities ({scanResults.vulnerabilities.length})
+          </h3>
+          
+          <div className="space-y-3">
+            {scanResults.vulnerabilities.map((vuln) => (
+              <div 
+                key={vuln.id} 
+                className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden"
+              >
+                <div 
+                  className="p-3 flex justify-between items-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/60"
+                  onClick={() => toggleVulnerability(vuln.id)}
+                >
+                  <div className="flex items-center">
+                    <span className={`px-2 py-1 rounded-md text-xs mr-3 ${getSeverityClass(vuln.severity)}`}>
+                      {vuln.severity.toUpperCase()}
+                    </span>
+                    <span className="font-medium">{vuln.name}</span>
+                  </div>
+                  {expandedVulnerability === vuln.id ? (
+                    <HiChevronUp className="h-5 w-5 text-gray-500" />
+                  ) : (
+                    <HiChevronDown className="h-5 w-5 text-gray-500" />
+                  )}
+                </div>
+                
+                {expandedVulnerability === vuln.id && (
+                  <div className="p-4 bg-gray-50 dark:bg-gray-800/40 border-t border-gray-200 dark:border-gray-700">
+                    <p className="text-gray-700 dark:text-gray-300 mb-2">
+                      <span className="font-medium">Description:</span> {vuln.description}
+                    </p>
+                    <p className="text-gray-700 dark:text-gray-300 mb-2">
+                      <span className="font-medium">File:</span> {vuln.file}
+                    </p>
+                    <p className="text-gray-700 dark:text-gray-300 mb-2">
+                      <span className="font-medium">Line:</span> {vuln.line}
+                    </p>
+                    <p className="text-gray-700 dark:text-gray-300 mb-2">
+                      <span className="font-medium">CVSS:</span> {vuln.cvss}
+                    </p>
+                    <div className="mt-3 mb-3 bg-gray-100 dark:bg-gray-700 p-2 rounded-md overflow-x-auto">
+                      <pre className="text-sm text-gray-800 dark:text-gray-300 font-mono">
+                        {vuln.code_snippet}
+                      </pre>
+                    </div>
+                    <p className="text-gray-700 dark:text-gray-300">
+                      <span className="font-medium">Recommendation:</span> {vuln.recommendation}
+                    </p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold">SAST Scan History</h2>
-          <button className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded transition-colors">
-            📄 Download Report
-          </button>
         </div>
         <div className="mb-4">
           <input 
             type="text" 
             placeholder="Search by file name..." 
             className="w-full p-2 rounded bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={filterKeyword}
+            onChange={(e) => setFilterKeyword(e.target.value)}
           />
         </div>
         <div className="overflow-x-auto">
@@ -106,30 +304,66 @@ const SAST = () => {
                 <th className="py-3 pr-6">File</th>
                 <th className="py-3 pr-6">Date</th>
                 <th className="py-3 pr-6">Status</th>
-                <th className="py-3">CVSS</th>
+                <th className="py-3 pr-6">Risk Level</th>
+                <th className="py-3">Reports</th>
               </tr>
             </thead>
             <tbody className="divide-y dark:divide-gray-700">
-              <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/60">
-                <td className="py-3 pr-6">frontend-code.zip</td>
-                <td className="py-3 pr-6">15 September 2023</td>
-                <td className="py-3 pr-6">
-                  <span className="text-green-500 dark:text-green-400">Completed</span>
-                </td>
-                <td className="py-3">
-                  <span className="bg-red-600 text-white px-2 py-1 rounded text-xs">8.5</span>
-                </td>
-              </tr>
-              <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/60">
-                <td className="py-3 pr-6">mobile-app.js</td>
-                <td className="py-3 pr-6">12 July 2023</td>
-                <td className="py-3 pr-6">
-                  <span className="text-yellow-500 dark:text-yellow-400">Pending</span>
-                </td>
-                <td className="py-3">
-                  <span className="bg-yellow-500 text-white px-2 py-1 rounded text-xs">5.4</span>
-                </td>
-              </tr>
+              {filteredHistory.map((scan) => (
+                <tr key={scan.scan_id} className="hover:bg-gray-50 dark:hover:bg-gray-800/60">
+                  <td className="py-3 pr-6">{scan.filename}</td>
+                  <td className="py-3 pr-6">{scan.scan_date}</td>
+                  <td className="py-3 pr-6">
+                    <span className="text-green-500 dark:text-green-400">{scan.status}</span>
+                  </td>
+                  <td className="py-3 pr-6">
+                    {scan.summary && (
+                      <div className="flex space-x-2">
+                        <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded">{scan.summary.high}</span>
+                        <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-yellow-500 rounded">{scan.summary.medium}</span>
+                        <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-blue-500 rounded">{scan.summary.low}</span>
+                      </div>
+                    )}
+                  </td>
+                  <td className="py-3">
+                    <div className="flex space-x-2">
+                      <button 
+                        onClick={() => downloadReport(scan.scan_id, 'pdf')}
+                        className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 p-1 rounded"
+                        title="Download PDF Report"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                      </button>
+                      <button 
+                        onClick={() => downloadReport(scan.scan_id, 'html')}
+                        className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 p-1 rounded"
+                        title="Download HTML Report"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                        </svg>
+                      </button>
+                      <button 
+                        onClick={() => downloadReport(scan.scan_id, 'json')}
+                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 p-1 rounded"
+                        title="Download JSON Report"
+                      >
+                        <HiOutlineDownload className="h-5 w-5" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+
+              {filteredHistory.length === 0 && (
+                <tr>
+                  <td colSpan="6" className="py-4 text-center text-gray-500 dark:text-gray-400">
+                    No scan history found
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
