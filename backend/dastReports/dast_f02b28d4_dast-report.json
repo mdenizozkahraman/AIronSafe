@@ -1,0 +1,50 @@
+{
+    "scan_id": "dast_f02b28d4",
+    "target_url": "https://google.com",
+    "scan_date": "2025-04-06 17:03:37",
+    "status": "completed",
+    "alerts": [
+        {
+            "id": "header-1",
+            "name": "Content Security Policy Not Set",
+            "description": "Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross-Site Scripting (XSS) and data injection attacks.",
+            "risk": "Medium",
+            "confidence": "High",
+            "url": "https://www.google.com/",
+            "solution": "Implement a Content Security Policy header to restrict resource loading to trusted sources."
+        },
+        {
+            "id": "header-2",
+            "name": "Missing X-Content-Type-Options Header",
+            "description": "The X-Content-Type-Options header is not set to 'nosniff', which means browsers could MIME-sniff the content type, potentially leading to security issues.",
+            "risk": "Low",
+            "confidence": "High",
+            "url": "https://www.google.com/",
+            "solution": "Set the X-Content-Type-Options header to 'nosniff'."
+        },
+        {
+            "id": "header-3",
+            "name": "Missing HTTP Strict Transport Security Header",
+            "description": "HSTS is not enabled for this site, which means it could be vulnerable to SSL stripping attacks.",
+            "risk": "Medium",
+            "confidence": "High",
+            "url": "https://www.google.com/",
+            "solution": "Add Strict-Transport-Security header with appropriate max-age value."
+        },
+        {
+            "id": "cookie-4",
+            "name": "Cookie Without Secure Flag",
+            "description": "A cookie (NID) is set without the Secure flag, which means it can be transmitted over unencrypted connections.",
+            "risk": "Medium",
+            "confidence": "High",
+            "url": "https://google.com",
+            "solution": "Set the Secure flag on all cookies that are sent over HTTPS."
+        }
+    ],
+    "summary": {
+        "high_alerts": 0,
+        "medium_alerts": 3,
+        "low_alerts": 1,
+        "info_alerts": 0
+    }
+}

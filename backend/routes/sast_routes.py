@@ -12,13 +12,30 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 import html
+import subprocess
+from .scan_file import simple_scan_file  # Import our custom scanner
+import requests
+from dotenv import load_dotenv
+import shutil
+import threading
+import time
 
 # Create blueprint for SAST routes
 sast_bp = Blueprint('sast_bp', __name__)
 
+# Load environment variables
+load_dotenv()
+
 # In-memory storage for scan history and results
 scan_history = []
 scan_results_store = {}
+
+# Path to uploads directory
+UPLOADS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'uploads')
+
+# OpenAI API configuration
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
+OPENAI_API_URL = "https://api.openai.com/v1/chat/completions"
 
 # AI-generated recommendations for vulnerabilities
 AI_RECOMMENDATIONS = {
@@ -325,12 +342,91 @@ EXAMPLE_VULNERABILITIES = {
     ]
 }
 
+# Helper function to clean uploads directory
+def clean_uploads_directory():
+    """Remove all files from the uploads directory"""
+    try:
+        if os.path.exists(UPLOADS_DIR):
+            for filename in os.listdir(UPLOADS_DIR):
+                file_path = os.path.join(UPLOADS_DIR, filename)
+                try:
+                    if os.path.isfile(file_path):
+                        os.unlink(file_path)
+                    elif os.path.isdir(file_path):
+                        shutil.rmtree(file_path)
+                except Exception as e:
+                    print(f"Error deleting {file_path}: {str(e)}")
+        print(f"Uploads directory cleaned at {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    except Exception as e:
+        print(f"Error cleaning uploads directory: {str(e)}")
+
+# Function to periodically clean uploads directory
+def periodic_clean():
+    """Periodically clean the uploads directory every 5 minutes"""
+    while True:
+        time.sleep(300)  # 5 minutes = 300 seconds
+        clean_uploads_directory()
+
+# Start the periodic cleaning in a background thread
+cleaning_thread = threading.Thread(target=periodic_clean, daemon=True)
+cleaning_thread.start()
+
 def get_ai_recommendation(vulnerability_name):
     """Get AI-generated recommendation for a specific vulnerability"""
+    # First check if we have a hardcoded recommendation
     for key in AI_RECOMMENDATIONS:
         if key in vulnerability_name:
             return AI_RECOMMENDATIONS[key]
-    return "<p><strong>AI Solution:</strong> No specific solution available for this vulnerability. Please consult security best practices or contact a security expert.</p>"
+    
+    # If no hardcoded recommendation, use OpenAI API
+    try:
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {OPENAI_API_KEY}"
+        }
+        
+        # Prepare prompt for OpenAI
+        prompt = f"""
+As a security expert, provide a detailed recommendation to fix the following vulnerability:
+"{vulnerability_name}"
+
+Include:
+1. A clear explanation of the vulnerability
+2. 3-5 specific steps to mitigate the issue
+3. Example code showing both vulnerable and fixed code patterns
+4. Best practices for preventing similar issues in the future
+
+Format the response as HTML with appropriate tags.
+"""
+        
+        data = {
+            "model": "gpt-3.5-turbo",
+            "messages": [
+                {"role": "system", "content": "You are a cybersecurity expert specializing in application security."},
+                {"role": "user", "content": prompt}
+            ],
+            "temperature": 0.7,
+            "max_tokens": 500
+        }
+        
+        response = requests.post(OPENAI_API_URL, headers=headers, json=data)
+        
+        if response.status_code == 200:
+            result = response.json()
+            ai_content = result['choices'][0]['message']['content']
+            
+            # Ensure content has HTML wrapper
+            if "<p>" not in ai_content:
+                ai_content = f"<p><strong>AI Solution:</strong> {ai_content}</p>"
+                
+            return ai_content
+        else:
+            print(f"OpenAI API error: {response.status_code} - {response.text}")
+            return "<p><strong>AI Solution:</strong> No specific solution available for this vulnerability. Please consult security best practices or contact a security expert.</p>"
+    
+    except Exception as e:
+        print(f"Error getting AI recommendation: {str(e)}")
+        return "<p><strong>AI Solution:</strong> No specific solution available for this vulnerability. Please consult security best practices or contact a security expert.</p>"
 
 def create_pdf_report(scan_data):
     """Create a PDF report from scan results"""
@@ -640,6 +736,9 @@ def upload_file_for_analysis():
             'message': 'No file selected',
             'status': 'error'
         }), 400
+    
+    # Clean uploads directory before saving new file
+    clean_uploads_directory()
         
     filename = secure_filename(file.filename)
     file_extension = filename.split('.')[-1].lower() if '.' in filename else 'generic'
@@ -648,23 +747,157 @@ def upload_file_for_analysis():
     scan_id = f"sast_{uuid.uuid4().hex[:8]}"
     scan_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
+    # Create uploads directory if it doesn't exist
+    os.makedirs(UPLOADS_DIR, exist_ok=True)
+    
+    # Save the file to the uploads directory
+    file_path = os.path.join(UPLOADS_DIR, f"{scan_id}_{filename}")
+    file.save(file_path)
+    
+    # Get absolute path to uploads directory (platform independent)
+    abs_uploads_dir = os.path.abspath(UPLOADS_DIR)
+    
+    # Set up the JSON result file path
+    json_result_path = os.path.join(UPLOADS_DIR, f"{scan_id}_result.json")
+    
+    # Determine semgrep configuration based on file extension
+    semgrep_config = "p/default"
+    if file_extension in ['py']:
+        semgrep_config = "p/python"
+    elif file_extension in ['js', 'jsx']:
+        semgrep_config = "p/javascript"
+    elif file_extension in ['ts', 'tsx']:
+        semgrep_config = "p/typescript"
+    elif file_extension in ['java']:
+        semgrep_config = "p/java"
+    
     # Get vulnerabilities based on file type
     vulnerabilities = []
-    if file_extension in ['js', 'jsx', 'ts', 'tsx']:
-        vulnerabilities.extend(EXAMPLE_VULNERABILITIES['javascript'])
-    elif file_extension in ['py']:
-        vulnerabilities.extend(EXAMPLE_VULNERABILITIES['python'])
-    elif file_extension in ['java']:
-        vulnerabilities.extend(EXAMPLE_VULNERABILITIES['java'])
+    semgrep_output = ""
+    
+    # First, run our simple scanner directly to ensure we always have results
+    print(f"Running simple scanner on {file_path}")
+    custom_vulns = simple_scan_file(file_path, json_result_path)
+    if custom_vulns:
+        print(f"Simple scanner found {len(custom_vulns)} potential vulnerabilities")
+        vulnerabilities.extend(custom_vulns)
+    
+    # Try to run Semgrep analysis too
+    try:
+        semgrep_output = ""
+        docker_process_failed = False
         
-    # Add some generic vulnerabilities
-    vulnerabilities.extend(random.sample(EXAMPLE_VULNERABILITIES['generic'], 
-                                        k=min(2, len(EXAMPLE_VULNERABILITIES['generic']))))
+        # First try using Docker
+        try:
+            # Adjust path format for Docker volume mapping based on platform
+            if os.name == 'nt':  # Windows
+                # Convert Windows path to Docker-compatible format
+                docker_path = abs_uploads_dir.replace('\\', '/').replace('C:', '/c')
+                docker_cmd = f'docker run --rm -v "{docker_path}":/src semgrep/semgrep semgrep --config "{semgrep_config}" /src'
+            else:  # Unix/Linux/Mac
+                docker_cmd = f'docker run --rm -v "{abs_uploads_dir}":/src semgrep/semgrep semgrep --config "{semgrep_config}" /src'
+            
+            print(f"Running Semgrep analysis with Docker: {docker_cmd}")
+            
+            # Run the command and capture the output
+            process = subprocess.Popen(
+                docker_cmd, 
+                shell=True, 
+                stdout=subprocess.PIPE, 
+                stderr=subprocess.PIPE
+            )
+            stdout, stderr = process.communicate()
+            
+            # Try with --json flag to get the JSON output
+            if process.returncode == 0:
+                # Now run again with JSON output
+                if os.name == 'nt':  # Windows
+                    docker_json_cmd = f'docker run --rm -v "{docker_path}":/src semgrep/semgrep semgrep --json --config "{semgrep_config}" /src'
+                else:
+                    docker_json_cmd = f'docker run --rm -v "{abs_uploads_dir}":/src semgrep/semgrep semgrep --json --config "{semgrep_config}" /src'
+                
+                print(f"Running Semgrep with JSON output: {docker_json_cmd}")
+                
+                json_process = subprocess.Popen(
+                    docker_json_cmd, 
+                    shell=True, 
+                    stdout=subprocess.PIPE, 
+                    stderr=subprocess.PIPE
+                )
+                json_stdout, json_stderr = json_process.communicate()
+                
+                if json_process.returncode == 0:
+                    # Write JSON output to file
+                    with open(json_result_path, 'w') as f:
+                        f.write(json_stdout.decode('utf-8'))
+                    print(f"Semgrep JSON results saved to: {json_result_path}")
+                    
+                    # Try to process the semgrep output as well
+                    try:
+                        semgrep_output = json_stdout.decode('utf-8')
+                        semgrep_results = json.loads(semgrep_output)
+                        
+                        # Process semgrep results into our vulnerability format
+                        for result in semgrep_results.get('results', []):
+                            vuln_id = f"SAST-{len(vulnerabilities) + 1}"
+                            severity = "high" if result.get('extra', {}).get('severity') == 'ERROR' else "medium"
+                            
+                            # Determine CVSS score based on severity
+                            cvss = 8.0 if severity == "high" else 5.0
+                            
+                            vuln = {
+                                'id': vuln_id,
+                                'name': result.get('check_id', 'Unknown Issue'),
+                                'description': result.get('extra', {}).get('message', 'Potential security issue detected'),
+                                'severity': severity,
+                                'cvss': cvss,
+                                'line': result.get('start', {}).get('line', 0),
+                                'file': result.get('path', 'Unknown'),
+                                'code_snippet': result.get('extra', {}).get('lines', '# No code snippet available'),
+                                'recommendation': 'Review the code for potential security issues.'
+                            }
+                            vulnerabilities.append(vuln)
+                            
+                        print(f"Parsed {len(vulnerabilities)} total vulnerabilities from all scanners")
+                    except Exception as json_err:
+                        print(f"Failed to process semgrep results: {str(json_err)}")
+                else:
+                    print(f"Error getting JSON output: {json_stderr.decode('utf-8')}")
+                
+                semgrep_output = stdout.decode('utf-8')
+                print("Semgrep Docker analysis completed successfully")
+            else:
+                docker_stderr = stderr.decode('utf-8')
+                print(f"Semgrep Docker command failed with error: {docker_stderr}")
+                docker_process_failed = True
+                
+        except Exception as docker_err:
+            print(f"Error running Semgrep with Docker: {str(docker_err)}")
+            docker_process_failed = True
+    
+    except Exception as e:
+        print(f"Error in Semgrep analysis: {str(e)}")
+    
+    # If no vulnerabilities were found, use the "clean code" indicator
+    if not vulnerabilities:
+        print("No vulnerabilities found")
+        vulnerabilities = [{
+            'id': 'SAST-NONE',
+            'name': 'No Vulnerabilities Found',
+            'description': 'The analysis did not detect any vulnerabilities in the uploaded code.',
+            'severity': 'info',
+            'cvss': 0.0,
+            'line': 0,
+            'file': filename,
+            'code_snippet': '# No vulnerable code found',
+            'recommendation': 'No action needed. Continue following secure coding practices.'
+        }]
     
     # Create scan results
     results = {
         "scan_id": scan_id,
         "filename": filename,
+        "file_path": file_path,
         "scan_date": scan_date,
         "status": "completed",
         "summary": {
@@ -673,7 +906,9 @@ def upload_file_for_analysis():
             "low": sum(1 for v in vulnerabilities if v['severity'] == 'low'),
             "total": len(vulnerabilities)
         },
-        "vulnerabilities": vulnerabilities
+        "vulnerabilities": vulnerabilities,
+        "result_json_path": json_result_path,  # Store the JSON result path
+        "no_vulnerabilities_found": not any(v['severity'] in ['high', 'medium', 'low'] for v in vulnerabilities)  # Flag indicating no real vulnerabilities
     }
     
     # Store scan results
@@ -683,9 +918,11 @@ def upload_file_for_analysis():
     scan_history_entry = {
         "scan_id": scan_id,
         "filename": filename,
+        "file_path": file_path,
         "scan_date": scan_date,
         "status": "completed",
         "summary": results["summary"],
+        "result_json_path": json_result_path,  # Store the JSON result path
         "highest_cvss": max(v['cvss'] for v in vulnerabilities) if vulnerabilities else 0
     }
     

@@ -1,0 +1,59 @@
+{
+    "scan_id": "dast_e9c02877",
+    "target_url": "https://aironsafe.com",
+    "scan_date": "2025-04-06 17:02:45",
+    "status": "completed",
+    "alerts": [
+        {
+            "id": "header-1",
+            "name": "Content Security Policy Not Set",
+            "description": "Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross-Site Scripting (XSS) and data injection attacks.",
+            "risk": "Medium",
+            "confidence": "High",
+            "url": "https://aironsafe.com/",
+            "solution": "Implement a Content Security Policy header to restrict resource loading to trusted sources."
+        },
+        {
+            "id": "header-2",
+            "name": "Missing X-Frame-Options Header",
+            "description": "The X-Frame-Options header is not set, which means the site could be at risk from clickjacking attacks.",
+            "risk": "Medium",
+            "confidence": "High",
+            "url": "https://aironsafe.com/",
+            "solution": "Set the X-Frame-Options header to DENY or SAMEORIGIN."
+        },
+        {
+            "id": "header-3",
+            "name": "Missing X-Content-Type-Options Header",
+            "description": "The X-Content-Type-Options header is not set to 'nosniff', which means browsers could MIME-sniff the content type, potentially leading to security issues.",
+            "risk": "Low",
+            "confidence": "High",
+            "url": "https://aironsafe.com/",
+            "solution": "Set the X-Content-Type-Options header to 'nosniff'."
+        },
+        {
+            "id": "header-4",
+            "name": "Missing HTTP Strict Transport Security Header",
+            "description": "HSTS is not enabled for this site, which means it could be vulnerable to SSL stripping attacks.",
+            "risk": "Medium",
+            "confidence": "High",
+            "url": "https://aironsafe.com/",
+            "solution": "Add Strict-Transport-Security header with appropriate max-age value."
+        },
+        {
+            "id": "info-5",
+            "name": "Server Technology Information Disclosure",
+            "description": "The server reveals technology information via headers: Express",
+            "risk": "Low",
+            "confidence": "High",
+            "url": "https://aironsafe.com",
+            "solution": "Configure the server to suppress the X-Powered-By header."
+        }
+    ],
+    "summary": {
+        "high_alerts": 0,
+        "medium_alerts": 3,
+        "low_alerts": 2,
+        "info_alerts": 0
+    }
+}

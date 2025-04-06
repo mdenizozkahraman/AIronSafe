@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAST Scan Report - https://google.com</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+        h2 {
+            color: #2c3e50;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .scan-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f8f9fa;
+        }
+        .risk-high {
+            color: white;
+            background-color: #e74c3c;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .risk-medium {
+            color: white;
+            background-color: #f39c12;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .risk-low {
+            color: white;
+            background-color: #3498db;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .alert-details {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .alert-high {
+            border-left: 5px solid #e74c3c;
+        }
+        .alert-medium {
+            border-left: 5px solid #f39c12;
+        }
+        .alert-low {
+            border-left: 5px solid #3498db;
+        }
+        .recommendations {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+        .recommendation-item {
+            margin-bottom: 8px;
+        }
+        footer {
+            margin-top: 30px;
+            padding-top: 10px;
+            border-top: 1px solid #ecf0f1;
+            text-align: center;
+            font-size: 0.8em;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <h1>DAST Scan Report</h1>
+    
+    <div class="scan-info">
+        <h2>Scan Information</h2>
+        <p><strong>Target URL:</strong> https://google.com</p>
+        <p><strong>Scan Date:</strong> 2025-04-06 17:03:37</p>
+        <p><strong>Scan ID:</strong> dast_f02b28d4</p>
+    </div>
+    
+    <div class="summary">
+        <h2>Summary</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Risk Level</th>
+                    <th>Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="risk-high">High</span></td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td><span class="risk-medium">Medium</span></td>
+                    <td>3</td>
+                </tr>
+                <tr>
+                    <td><span class="risk-low">Low</span></td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>Info</td>
+                    <td>0</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="findings">
+        <h2>Detailed Findings</h2>
+    
+        <div class="alert-details alert-medium">
+            <h3>1. Content Security Policy Not Set <span class="risk-medium">Medium Risk</span></h3>
+            <p><strong>Description:</strong> Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross-Site Scripting (XSS) and data injection attacks.</p>
+            <p><strong>URL:</strong> https://www.google.com/</p>
+            <p><strong>Solution:</strong> Implement a Content Security Policy header to restrict resource loading to trusted sources.</p>
+            
+            <div class="recommendations">
+                <h4>AI Recommendations:</h4>
+                <ul>
+        
+                    <li class="recommendation-item">Start with CSP Report-Only mode to fix issues.</li>
+            
+                    <li class="recommendation-item">Use nonce or hash-based CSP methods.</li>
+            
+                    <li class="recommendation-item">Set up a reporting endpoint to monitor CSP violations.</li>
+            
+                </ul>
+            </div>
+        </div>
+        
+        <div class="alert-details alert-low">
+            <h3>2. Missing X-Content-Type-Options Header <span class="risk-low">Low Risk</span></h3>
+            <p><strong>Description:</strong> The X-Content-Type-Options header is not set to &#x27;nosniff&#x27;, which means browsers could MIME-sniff the content type, potentially leading to security issues.</p>
+            <p><strong>URL:</strong> https://www.google.com/</p>
+            <p><strong>Solution:</strong> Set the X-Content-Type-Options header to &#x27;nosniff&#x27;.</p>
+            
+            <div class="recommendations">
+                <h4>AI Recommendations:</h4>
+                <ul>
+        
+                    <li class="recommendation-item">Integrate security testing into your CI/CD pipeline.</li>
+            
+                    <li class="recommendation-item">Regularly review the OWASP Top 10 list for application security.</li>
+            
+                    <li class="recommendation-item">Regularly update third-party libraries and dependencies.</li>
+            
+                </ul>
+            </div>
+        </div>
+        
+        <div class="alert-details alert-medium">
+            <h3>3. Missing HTTP Strict Transport Security Header <span class="risk-medium">Medium Risk</span></h3>
+            <p><strong>Description:</strong> HSTS is not enabled for this site, which means it could be vulnerable to SSL stripping attacks.</p>
+            <p><strong>URL:</strong> https://www.google.com/</p>
+            <p><strong>Solution:</strong> Add Strict-Transport-Security header with appropriate max-age value.</p>
+            
+            <div class="recommendations">
+                <h4>AI Recommendations:</h4>
+                <ul>
+        
+                    <li class="recommendation-item">Regularly review the OWASP Top 10 list for application security.</li>
+            
+                    <li class="recommendation-item">Regularly scan for and patch security vulnerabilities.</li>
+            
+                    <li class="recommendation-item">Integrate security testing into your CI/CD pipeline.</li>
+            
+                </ul>
+            </div>
+        </div>
+        
+        <div class="alert-details alert-medium">
+            <h3>4. Cookie Without Secure Flag <span class="risk-medium">Medium Risk</span></h3>
+            <p><strong>Description:</strong> A cookie (NID) is set without the Secure flag, which means it can be transmitted over unencrypted connections.</p>
+            <p><strong>URL:</strong> https://google.com</p>
+            <p><strong>Solution:</strong> Set the Secure flag on all cookies that are sent over HTTPS.</p>
+            
+            <div class="recommendations">
+                <h4>AI Recommendations:</h4>
+                <ul>
+        
+                    <li class="recommendation-item">Encrypt or sign cookie values.</li>
+            
+                    <li class="recommendation-item">Enable Secure flag for all cookies.</li>
+            
+                    <li class="recommendation-item">Set Same-Site attribute to Strict or Lax.</li>
+            
+                </ul>
+            </div>
+        </div>
+        
+    <footer>
+        <p>Report generated at: 2025-04-06 17:03:50</p>
+        <p>This report was automatically generated by AIronSafe DAST Scanner</p>
+    </footer>
+</body>
+</html>
+    

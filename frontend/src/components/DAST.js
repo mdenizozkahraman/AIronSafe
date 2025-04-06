@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { HiOutlineSearch, HiOutlineExclamationCircle, HiOutlineInformationCircle, HiChevronDown, HiChevronUp, HiOutlineDownload, HiOutlineDocumentText, HiOutlineCode } from 'react-icons/hi';
+import axios from 'axios';
+
+// Define API URL constant
+const API_URL = 'http://localhost:5000/api';
 
 const DAST = () => {
   const [url, setUrl] = useState('');
@@ -9,6 +13,9 @@ const DAST = () => {
   const [error, setError] = useState('');
   const [expandedAlert, setExpandedAlert] = useState(null);
   const [filterKeyword, setFilterKeyword] = useState('');
+  const [scanId, setScanId] = useState(null);
+  const [pollingInterval, setPollingInterval] = useState(null);
+  const [loadingMessage, setLoadingMessage] = useState("Starting scan... this may take 1-2 minutes");
 
   useEffect(() => {
     // Fetch scan history when component mounts
@@ -34,43 +41,128 @@ const DAST = () => {
     setUrl(e.target.value);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!url) return;
+  const startScan = (e) => {
+    e.preventDefault(); // Prevent default form submission
+    
+    if (!url) {
+      setError('Please enter a URL to scan');
+      return;
+    }
+    
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
       setError('Please enter a valid URL starting with http:// or https://');
       return;
     }
-
-    setScanning(true);
-    setError('');
-    setScanResults(null);
     
-    try {
-      const response = await fetch('http://localhost:5000/api/dast/scan', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ url })
+    setScanning(true);
+    setScanResults(null);
+    setError(null);
+    setLoadingMessage("Starting scan... this may take 1-2 minutes");
+    
+    // Make the API call to start a scan
+    console.log("Starting scan for URL:", url);
+    axios.post(`${API_URL}/dast/scan`, { url: url })
+      .then(response => {
+        console.log("Scan started response:", response.data);
+        const scanId = response.data.scan_id;
+        
+        // If we already got results immediately, show them
+        if (response.data.results) {
+          console.log("Got immediate results");
+          setScanning(false);
+          setScanResults(response.data.results);
+          fetchScanHistory();
+          return;
+        }
+        
+        // Otherwise start polling for status
+        setScanId(scanId);
+        setLoadingMessage("Scan in progress... This may take 1-2 minutes to complete");
+        
+        // Start polling for scan status
+        const pollInterval = setInterval(() => {
+          console.log("Polling for scan status...");
+          axios.get(`${API_URL}/dast/scan_status/${scanId}`)
+            .then(statusResponse => {
+              console.log("Status response:", statusResponse.data);
+              const status = statusResponse.data.status;
+              const message = statusResponse.data.message || '';
+              
+              // Update loading message with status message if available
+              if (message) {
+                setLoadingMessage(message);
+              }
+              
+              if (status === "completed") {
+                // When scan is complete, fetch the full results
+                clearInterval(pollInterval);
+                console.log("Scan completed, fetching results");
+                
+                axios.get(`${API_URL}/dast/report/${scanId}`)
+                  .then(reportResponse => {
+                    console.log("Received report:", reportResponse.data);
+                    setScanning(false);
+                    setScanResults(reportResponse.data.scan_data);
+                    // Refresh scan history after a successful scan
+                    fetchScanHistory();
+                  })
+                  .catch(error => {
+                    console.error("Error fetching report:", error);
+                    setScanning(false);
+                    setError('Failed to fetch scan results: ' + (error.response?.data?.message || error.message));
+                  });
+              } 
+              else if (status === "failed") {
+                // If scan failed, show the error
+                clearInterval(pollInterval);
+                console.log("Scan failed:", statusResponse.data.error);
+                setScanning(false);
+                setError('Scan failed: ' + (statusResponse.data.error || 'Unknown error'));
+              }
+              else if (status === "in_progress") {
+                // Still scanning, update message
+                console.log("Scan in progress");
+                if (message) {
+                  setLoadingMessage(message);
+                } else {
+                  // Update with timestamp to show polling is working
+                  const now = new Date().toLocaleTimeString();
+                  setLoadingMessage(`Scan in progress at ${now}... This may take 1-2 minutes`);
+                }
+              }
+              else if (status === "not_found") {
+                // Scan not found
+                clearInterval(pollInterval);
+                console.log("Scan not found");
+                setScanning(false);
+                setError('Scan not found. Please try again.');
+              }
+            })
+            .catch(error => {
+              console.error("Error polling scan status:", error);
+              // Show error in loading message but don't stop polling on temporary errors
+              setLoadingMessage(`Checking status... (Last attempt failed: ${error.message})`);
+            });
+        }, 3000); // Poll every 3 seconds
+        
+        // Store the interval ID so we can clear it if component unmounts
+        setPollingInterval(pollInterval);
+      })
+      .catch(error => {
+        console.error("Error starting scan:", error);
+        setScanning(false);
+        setError('Failed to start scan: ' + (error.response?.data?.message || error.message));
       });
-      
-      const data = await response.json();
-      
-      if (response.ok) {
-        setScanResults(data.results);
-        // Refresh scan history after new scan
-        fetchScanHistory();
-      } else {
-        setError(data.message || 'Failed to start scan');
-      }
-    } catch (err) {
-      console.error('Error starting scan:', err);
-      setError('Failed to connect to scan service. Please try again later.');
-    } finally {
-      setScanning(false);
-    }
   };
+
+  // Cleanup polling interval on unmount
+  useEffect(() => {
+    return () => {
+      if (pollingInterval) {
+        clearInterval(pollingInterval);
+      }
+    };
+  }, [pollingInterval]);
 
   const toggleAlert = (alertIndex) => {
     if (expandedAlert === alertIndex) {
@@ -148,7 +240,7 @@ const DAST = () => {
 
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
         <h2 className="text-lg font-semibold mb-4">Start New DAST Scan</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={startScan} className="space-y-4">
           <input
             type="text"
             value={url}
@@ -165,11 +257,12 @@ const DAST = () => {
           >
             {scanning ? (
               <>
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Scanning...
+                <div className="text-center my-5">
+                  <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                  </div>
+                  <p className="mt-3">{loadingMessage}</p>
+                </div>
               </>
             ) : (
               <>
@@ -290,9 +383,17 @@ const DAST = () => {
                     </td>
                     <td className="py-3 pr-6">
                       {scan.status === 'completed' ? (
-                        <span className={`bg-${scan.high_alerts > 0 ? 'red' : scan.medium_alerts > 0 ? 'yellow' : 'blue'}-600 text-white px-2 py-1 rounded text-xs`}>
-                          {scan.high_alerts > 0 ? scan.high_alerts : scan.medium_alerts > 0 ? scan.medium_alerts : scan.low_alerts}
-                        </span>
+                        <div className="flex space-x-2">
+                          <span className="bg-red-600 text-white px-2 py-1 rounded text-xs">
+                            {scan.alerts_count?.high || scan.high_alerts || 0}
+                          </span>
+                          <span className="bg-yellow-500 text-white px-2 py-1 rounded text-xs">
+                            {scan.alerts_count?.medium || scan.medium_alerts || 0}
+                          </span>
+                          <span className="bg-blue-500 text-white px-2 py-1 rounded text-xs">
+                            {scan.alerts_count?.low || scan.low_alerts || 0}
+                          </span>
+                        </div>
                       ) : (
                         <span className="bg-gray-600 text-white px-2 py-1 rounded text-xs">—</span>
                       )}

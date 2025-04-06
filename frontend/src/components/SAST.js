@@ -135,7 +135,7 @@ const SAST = () => {
     scan.filename.toLowerCase().includes(filterKeyword.toLowerCase())
   );
 
-  return (
+    return (
     <div className="space-y-6">
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
         <h2 className="text-lg font-semibold mb-4">Upload Code for Analysis</h2>
@@ -232,54 +232,63 @@ const SAST = () => {
           </h3>
           
           <div className="space-y-3">
-            {scanResults.vulnerabilities.map((vuln) => (
-              <div 
-                key={vuln.id} 
-                className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden"
-              >
+            {scanResults.no_vulnerabilities_found ? (
+              <div className="p-4 bg-green-100 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg text-center">
+                <p className="text-green-600 dark:text-green-400 font-medium">
+                  No vulnerabilities were detected in the uploaded code. Great job!
+                </p>
+              </div>
+            ) : (
+              scanResults.vulnerabilities.map((vuln) => (
                 <div 
-                  className="p-3 flex justify-between items-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/60"
-                  onClick={() => toggleVulnerability(vuln.id)}
+                  key={vuln.id} 
+                  className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden"
                 >
-                  <div className="flex items-center">
-                    <span className={`px-2 py-1 rounded-md text-xs mr-3 ${getSeverityClass(vuln.severity)}`}>
-                      {vuln.severity.toUpperCase()}
-                    </span>
-                    <span className="font-medium">{vuln.name}</span>
+                  <div 
+                    className="p-3 flex justify-between items-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/60"
+                    onClick={() => toggleVulnerability(vuln.id)}
+                  >
+                    <div className="flex items-center">
+                      <span className={`px-2 py-1 rounded-md text-xs mr-3 ${getSeverityClass(vuln.severity)}`}>
+                        {vuln.severity.toUpperCase()}
+                      </span>
+                      <span className="font-medium">{vuln.name}</span>
+                    </div>
+                    {expandedVulnerability === vuln.id ? (
+                      <HiChevronUp className="h-5 w-5 text-gray-500" />
+                    ) : (
+                      <HiChevronDown className="h-5 w-5 text-gray-500" />
+                    )}
                   </div>
-                  {expandedVulnerability === vuln.id ? (
-                    <HiChevronUp className="h-5 w-5 text-gray-500" />
-                  ) : (
-                    <HiChevronDown className="h-5 w-5 text-gray-500" />
+                  
+                  {expandedVulnerability === vuln.id && (
+                    <div className="p-4 bg-gray-50 dark:bg-gray-800/40 border-t border-gray-200 dark:border-gray-700">
+                      <p className="text-gray-700 dark:text-gray-300 mb-2">
+                        <span className="font-medium">Description:</span> {vuln.description}
+                      </p>
+                      <p className="text-gray-700 dark:text-gray-300 mb-2">
+                        <span className="font-medium">File:</span> {vuln.file}
+                      </p>
+                      <p className="text-gray-700 dark:text-gray-300 mb-2">
+                        <span className="font-medium">Line:</span> {vuln.line}
+                      </p>
+                      <p className="text-gray-700 dark:text-gray-300 mb-2">
+                        <span className="font-medium">CVSS:</span> {vuln.cvss}
+                      </p>
+                      <div className="mt-3 mb-3 bg-gray-100 dark:bg-gray-700 p-2 rounded-md overflow-x-auto">
+                        <pre className="text-sm text-gray-800 dark:text-gray-300 font-mono">
+                          {vuln.code_snippet}
+                        </pre>
+                      </div>
+                      <div className="text-gray-700 dark:text-gray-300">
+                        <span className="font-medium">AI Recommendation:</span> 
+                        <div dangerouslySetInnerHTML={{ __html: vuln.recommendation }} />
+                      </div>
+                    </div>
                   )}
                 </div>
-                
-                {expandedVulnerability === vuln.id && (
-                  <div className="p-4 bg-gray-50 dark:bg-gray-800/40 border-t border-gray-200 dark:border-gray-700">
-                    <p className="text-gray-700 dark:text-gray-300 mb-2">
-                      <span className="font-medium">Description:</span> {vuln.description}
-                    </p>
-                    <p className="text-gray-700 dark:text-gray-300 mb-2">
-                      <span className="font-medium">File:</span> {vuln.file}
-                    </p>
-                    <p className="text-gray-700 dark:text-gray-300 mb-2">
-                      <span className="font-medium">Line:</span> {vuln.line}
-                    </p>
-                    <p className="text-gray-700 dark:text-gray-300 mb-2">
-                      <span className="font-medium">CVSS:</span> {vuln.cvss}
-                    </p>
-                    <div className="mt-3 mb-3 bg-gray-100 dark:bg-gray-700 p-2 rounded-md overflow-x-auto">
-                      <pre className="text-sm text-gray-800 dark:text-gray-300 font-mono">
-                        {vuln.code_snippet}
-                      </pre>
-                    </div>
-                    <p className="text-gray-700 dark:text-gray-300">
-                      <span className="font-medium">Recommendation:</span> {vuln.recommendation}
-                    </p>
-                  </div>
-                )}
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       )}
@@ -351,8 +360,8 @@ const SAST = () => {
                         title="Download JSON Report"
                       >
                         <HiOutlineDownload className="h-5 w-5" />
-                      </button>
-                    </div>
+                    </button>
+                </div>
                   </td>
                 </tr>
               ))}
@@ -368,8 +377,8 @@ const SAST = () => {
           </table>
         </div>
       </div>
-    </div>
-  );
+        </div>
+    );
 };
 
 export default SAST;

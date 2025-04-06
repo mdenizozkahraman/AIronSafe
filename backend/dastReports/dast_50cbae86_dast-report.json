@@ -1,0 +1,23 @@
+{
+    "scan_id": "dast_50cbae86",
+    "target_url": "https://instagram.com",
+    "scan_date": "2025-04-06 17:29:26",
+    "status": "completed",
+    "alerts": [
+        {
+            "id": "cookie-1",
+            "name": "Cookie Without HttpOnly Flag",
+            "description": "A cookie (csrftoken) is set without the HttpOnly flag, which means it can be accessed by JavaScript.",
+            "risk": "Low",
+            "confidence": "High",
+            "url": "https://instagram.com",
+            "solution": "Set the HttpOnly flag on cookies containing sensitive data."
+        }
+    ],
+    "summary": {
+        "high_alerts": 0,
+        "medium_alerts": 0,
+        "low_alerts": 1,
+        "info_alerts": 0
+    }
+}
