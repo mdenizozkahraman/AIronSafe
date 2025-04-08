@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { HiOutlineUser, HiOutlineMail, HiOutlineLockClosed, HiOutlineUserAdd } from 'react-icons/hi';
+import { register } from '../services/authService';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -44,27 +45,8 @@ const Register = () => {
     setLoading(true);
     
     try {
-      const response = await fetch('https://aironsafe.com/api/users/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          username: formData.username,
-          email: formData.email,
-          password: formData.password,
-          full_name: formData.username
-        })
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'Registration failed');
-      }
-      
-      console.log('Registration successful:', data);
-      // Navigate to login page
+      await register(formData.username, formData.email, formData.password, formData.username);
+      console.log('Registration successful');
       navigate('/login');
     } catch (err) {
       console.error('Registration error:', err);

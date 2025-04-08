@@ -9,7 +9,7 @@ export const register = async (username, email, password, fullName) => {
       full_name: fullName
     });
 
-    const response = await fetch(`${API_URL}/api/users/register`, {
+    const response = await fetch(`${API_URL}/users/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -39,7 +39,7 @@ export const register = async (username, email, password, fullName) => {
 
 export const login = async (email, password) => {
   try {
-    const response = await fetch(`${API_URL}/api/users/login`, {
+    const response = await fetch(`${API_URL}/users/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

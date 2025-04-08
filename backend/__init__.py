@@ -13,49 +13,42 @@ def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
 
-    # CORS ayarları
+    # CORS settings
     CORS(app, resources={r"/*": {"origins": "*"}})
 
-    # Veritabanı bağlantı ayarları
+    # Database connection settings
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@db/aironsafek'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    # SECRET_KEY ayarı
+    # SECRET_KEY setting
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'dev-secret-key'
     
-    # JWT ayarları
+    # JWT settings
     app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY') or 'jwt-dev-secret-key'
-    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 3600  # 1 saat
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 3600  # 1 hour
 
-    # Logging ayarları
+    # Logging settings
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
     
-    # Test konfigürasyonu için
+    # Test configuration
     if test_config is not None:
-        # load the test config if passed in
         app.config.from_mapping(test_config)
 
-    # Veritabanını başlat
+    # Initialize database
     db.init_app(app)
     
-    # JWT Manager'ı başlat
+    # Initialize JWT Manager
     jwt.init_app(app)
 
-    # Blueprint'leri kaydet
-    # from routes.hello import hello_bp  # Bu satırı kaldırıyoruz
-    # app.register_blueprint(hello_bp)   # Bu satırı kaldırıyoruz
-    
-    # Yeni blueprintleri kaydet
-    from routes.auth_routes import auth_bp
+    # Register blueprints
     from routes.dast_routes import dast_bp
     from routes.sast_routes import sast_bp
     
-    app.register_blueprint(auth_bp)
     app.register_blueprint(dast_bp, url_prefix='/api/dast')
     app.register_blueprint(sast_bp, url_prefix='/api/sast')
 
-    # Veritabanını oluştur
+    # Create database tables
     with app.app_context():
         try:
             db.create_all()
