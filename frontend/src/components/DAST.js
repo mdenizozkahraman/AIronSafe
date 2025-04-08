@@ -3,7 +3,7 @@ import { HiOutlineSearch, HiOutlineExclamationCircle, HiOutlineInformationCircle
 import axios from 'axios';
 
 // Define API URL constant
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://aironsafe.com/api';
 
 const DAST = () => {
   const [url, setUrl] = useState('');
@@ -24,7 +24,7 @@ const DAST = () => {
 
   const fetchScanHistory = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/dast/scan_history');
+      const response = await fetch('https://aironsafe.com/api/dast/scan_history');
       const data = await response.json();
       
       if (response.ok) {
@@ -198,12 +198,12 @@ const DAST = () => {
       
       if (format === 'pdf' || format === 'html') {
         // Direct browser download for PDF and HTML
-        window.open(`http://localhost:5000/api/dast/report/${scanId}?format=${format}`, '_blank');
+        window.open(`https://aironsafe.com/api/dast/report/${scanId}?format=${format}`, '_blank');
         return;
       }
       
       // For JSON format
-      const response = await fetch(`http://localhost:5000/api/dast/report/${scanId}`);
+      const response = await fetch(`https://aironsafe.com/api/dast/report/${scanId}`);
       
       if (!response.ok) {
         throw new Error('Failed to download report');

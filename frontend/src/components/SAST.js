@@ -17,7 +17,7 @@ const SAST = () => {
 
   const fetchScanHistory = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/sast/scan_history');
+      const response = await fetch('https://aironsafe.com/api/sast/scan_history');
       const data = await response.json();
       
       if (response.ok) {
@@ -52,7 +52,7 @@ const SAST = () => {
       const formData = new FormData();
       formData.append('file', file);
       
-      const response = await fetch('http://localhost:5000/api/sast/upload', {
+      const response = await fetch('https://aironsafe.com/api/sast/scan', {
         method: 'POST',
         body: formData
       });
@@ -85,12 +85,12 @@ const SAST = () => {
       
       if (format === 'pdf' || format === 'html') {
         // For PDF and HTML, open in a new tab to trigger browser download
-        window.open(`http://localhost:5000/api/sast/report/${scanId}?format=${format}`, '_blank');
+        window.open(`https://aironsafe.com/api/sast/report/${scanId}?format=${format}`, '_blank');
         return;
       }
       
       // For JSON format
-      const response = await fetch(`http://localhost:5000/api/sast/report/${scanId}`);
+      const response = await fetch(`https://aironsafe.com/api/sast/report/${scanId}`);
       
       if (!response.ok) {
         throw new Error('Failed to download report');

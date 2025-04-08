@@ -44,7 +44,7 @@ const Register = () => {
     setLoading(true);
     
     try {
-      const response = await fetch('http://localhost:5000/api/users/register', {
+      const response = await fetch('https://aironsafe.com/api/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -53,7 +53,7 @@ const Register = () => {
           username: formData.username,
           email: formData.email,
           password: formData.password,
-          full_name: formData.username // Using username as full_name for simplicity
+          full_name: formData.username
         })
       });
       

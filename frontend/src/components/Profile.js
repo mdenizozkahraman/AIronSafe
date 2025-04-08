@@ -49,7 +49,7 @@ const Profile = () => {
         return;
       }
       
-      const response = await fetch('http://localhost:5000/api/users/me', {
+      const response = await fetch('https://aironsafe.com/api/users/me', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -114,7 +114,7 @@ const Profile = () => {
         return;
       }
       
-      const response = await fetch('http://localhost:5000/api/profile', {
+      const response = await fetch('https://aironsafe.com/api/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

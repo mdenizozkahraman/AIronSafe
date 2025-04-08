@@ -1,4 +1,4 @@
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_URL = 'https://aironsafe.com/api';
 
 export const register = async (username, email, password, fullName) => {
   try {
