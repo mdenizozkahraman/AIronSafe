@@ -1,0 +1,36 @@
+{
+  "filename": "vuln.py",
+  "scan_date": "2025-04-27 10:33:17",
+  "status": "completed",
+  "summary": {
+    "high": 1,
+    "medium": 1,
+    "low": 0,
+    "total": 2
+  },
+  "vulnerabilities": [
+    {
+      "id": "SQLI-001",
+      "name": "SQL Injection",
+      "description": "Doğrudan SQL sorgusu oluşturma güvenlik açığına neden olabilir",
+      "severity": "high",
+      "cvss": 9.0,
+      "line": 1056,
+      "file": "vuln.py",
+      "code_snippet": "// SQL sorgusu örneği\n Injection\r\ndef login(user_input):\r\n    query = f\"SELECT * FROM users WHERE name = '{user_input}'\"  ",
+      "recommendation": "Parametreli sorgular veya ORM kullanın"
+    },
+    {
+      "id": "HCP-001",
+      "name": "Hardcoded Password",
+      "description": "Kod içinde sabit şifre kullanımı tespit edildi",
+      "severity": "medium",
+      "cvss": 5.0,
+      "line": 508,
+      "file": "vuln.py",
+      "code_snippet": "// Şifre tanımı örneği\nad\r\n\r\ndef weak_crypto():\r\n    import hashlib\r\n    password = \"admin123\"\r\n    hashed = hashlib.md5(pa",
+      "recommendation": "Şifreleri environment variable veya güvenli bir yapılandırma dosyasında saklayın"
+    }
+  ],
+  "scan_id": "sast_d87551a1"
+}

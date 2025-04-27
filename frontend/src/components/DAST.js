@@ -348,7 +348,12 @@ const DAST = () => {
 
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold">DAST Scan History</h2>
+          <div className="flex items-center space-x-2">
+            <h2 className="text-lg font-semibold">DAST Scan History</h2>
+            <span className="px-2 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full">
+              {filteredHistory.length} {filteredHistory.length === 1 ? 'entry' : 'entries'}
+            </span>
+          </div>
         </div>
         <div className="mb-4">
           <input 

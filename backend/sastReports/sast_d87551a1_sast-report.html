@@ -1,0 +1,222 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>SAST Scan Report - sast_d87551a1</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                margin: 0;
+                padding: 20px;
+                color: #333;
+            }
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+            header {
+                text-align: center;
+                margin-bottom: 30px;
+                padding-bottom: 20px;
+                border-bottom: 1px solid #eee;
+            }
+            h1 {
+                color: #2c3e50;
+            }
+            h2 {
+                color: #3498db;
+                border-bottom: 1px solid #eee;
+                padding-bottom: 10px;
+            }
+            h3 {
+                color: #2c3e50;
+            }
+            .scan-info {
+                background: #f8f9fa;
+                padding: 15px;
+                border-radius: 5px;
+                margin-bottom: 20px;
+            }
+            .summary {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 15px;
+                margin-bottom: 30px;
+            }
+            .summary-item {
+                flex: 1;
+                min-width: 200px;
+                padding: 20px;
+                border-radius: 5px;
+                color: white;
+                text-align: center;
+            }
+            .high {
+                background-color: #e74c3c;
+            }
+            .medium {
+                background-color: #f39c12;
+            }
+            .low {
+                background-color: #3498db;
+            }
+            .total {
+                background-color: #2c3e50;
+            }
+            .vulnerability {
+                background: #f8f9fa;
+                padding: 20px;
+                border-radius: 5px;
+                margin-bottom: 20px;
+                border-left: 5px solid #ddd;
+            }
+            .vulnerability.high {
+                border-left-color: #e74c3c;
+            }
+            .vulnerability.medium {
+                border-left-color: #f39c12;
+            }
+            .vulnerability.low {
+                border-left-color: #3498db;
+            }
+            .severity {
+                display: inline-block;
+                padding: 3px 10px;
+                border-radius: 3px;
+                color: white;
+                font-weight: bold;
+            }
+            .code {
+                background: #272822;
+                color: #f8f8f2;
+                padding: 15px;
+                border-radius: 5px;
+                overflow-x: auto;
+                font-family: monospace;
+            }
+            .ai-recommendation {
+                background: #EFF8FF;
+                padding: 15px;
+                border-radius: 5px;
+                margin-top: 15px;
+                border-left: 5px solid #3498db;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <header>
+                <h1>SAST Security Scan Report</h1>
+                <p>Generated on 2025-04-27 10:33:17</p>
+            </header>
+            
+            <div class="scan-info">
+                <p><strong>Scan ID:</strong> sast_d87551a1</p>
+                <p><strong>Filename:</strong> vuln.py</p>
+                <p><strong>Scan Date:</strong> 2025-04-27 10:33:17</p>
+                <p><strong>Status:</strong> completed</p>
+            </div>
+            
+            <h2>Vulnerability Summary</h2>
+            <div class="summary">
+                <div class="summary-item high">
+                    <h3>1</h3>
+                    <p>High Risk</p>
+                </div>
+                <div class="summary-item medium">
+                    <h3>1</h3>
+                    <p>Medium Risk</p>
+                </div>
+                <div class="summary-item low">
+                    <h3>0</h3>
+                    <p>Low Risk</p>
+                </div>
+                <div class="summary-item total">
+                    <h3>2</h3>
+                    <p>Total Findings</p>
+                </div>
+            </div>
+            
+            <h2>Detailed Findings</h2>
+    
+            <div class="vulnerability high">
+                <h3>
+                    <span class="severity high" style="background-color: #e74c3c;">
+                        HIGH
+                    </span> 
+                    SQLI-001: SQL Injection (CVSS: 9.0)
+                </h3>
+                
+                <p><strong>Description:</strong> Doğrudan SQL sorgusu oluşturma güvenlik açığına neden olabilir</p>
+                <p><strong>File:</strong> vuln.py</p>
+                <p><strong>Line:</strong> 1056</p>
+                
+                <p><strong>Vulnerable Code:</strong></p>
+                <pre class="code">// SQL sorgusu örneği
+ Injection
+def login(user_input):
+    query = f&quot;SELECT * FROM users WHERE name = &#x27;{user_input}&#x27;&quot;  </pre>
+                
+                <p><strong>Recommendation:</strong> Parametreli sorgular veya ORM kullanın</p>
+                
+                <div class="ai-recommendation">
+                    
+    <p><strong>AI Solution:</strong> To fix SQL injection vulnerabilities:</p>
+    <ol>
+      <li>Always use parameterized queries or prepared statements</li>
+      <li>Never concatenate user input directly into SQL strings</li>
+      <li>Use an ORM (Object-Relational Mapping) library</li>
+      <li>Implement proper input validation and sanitization</li>
+      <li>Apply the principle of least privilege for database accounts</li>
+    </ol>
+    <p><strong>Example code fix:</strong></p>
+    <pre>
+    # Instead of:
+    query = f"SELECT * FROM users WHERE username = '{username}';"
+    
+    # Use parameterized queries:
+    query = "SELECT * FROM users WHERE username = %s;"
+    cursor.execute(query, (username,))
+    
+    # Or with SQLAlchemy:
+    user = Users.query.filter_by(username=username).first()
+    </pre>
+    
+                </div>
+            </div>
+        
+            <div class="vulnerability medium">
+                <h3>
+                    <span class="severity medium" style="background-color: #f39c12;">
+                        MEDIUM
+                    </span> 
+                    HCP-001: Hardcoded Password (CVSS: 5.0)
+                </h3>
+                
+                <p><strong>Description:</strong> Kod içinde sabit şifre kullanımı tespit edildi</p>
+                <p><strong>File:</strong> vuln.py</p>
+                <p><strong>Line:</strong> 508</p>
+                
+                <p><strong>Vulnerable Code:</strong></p>
+                <pre class="code">// Şifre tanımı örneği
+ad
+
+def weak_crypto():
+    import hashlib
+    password = &quot;admin123&quot;
+    hashed = hashlib.md5(pa</pre>
+                
+                <p><strong>Recommendation:</strong> Şifreleri environment variable veya güvenli bir yapılandırma dosyasında saklayın</p>
+                
+                <div class="ai-recommendation">
+                    <p><strong>AI Solution:</strong> No specific solution available for this vulnerability. Please consult security best practices or contact a security expert.</p>
+                </div>
+            </div>
+        
+        </div>
+    </body>
+    </html>
+    

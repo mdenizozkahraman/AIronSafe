@@ -9,6 +9,7 @@ const SAST = () => {
   const [error, setError] = useState('');
   const [expandedVulnerability, setExpandedVulnerability] = useState(null);
   const [filterKeyword, setFilterKeyword] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
 
   // Fetch scan history when component mounts
   useEffect(() => {
@@ -33,8 +34,40 @@ const SAST = () => {
   };
 
   const handleFileChange = (e) => {
-    if (e.target.files[0]) {
-      setFile(e.target.files[0]);
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+      setScanResults(null);
+      setError('');
+    }
+  };
+
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    
+    const droppedFile = e.dataTransfer.files?.[0];
+    if (droppedFile) {
+      setFile(droppedFile);
       setScanResults(null);
       setError('');
     }
@@ -142,12 +175,20 @@ const SAST = () => {
         <form onSubmit={handleFileUpload} className="space-y-4">
           <div className="flex items-center justify-center w-full">
             <label 
-              className={`flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer ${
-                file ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700/30'
-              } transition-all duration-200`}
+              className={`flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer transition-all duration-200 ${
+                isDragging 
+                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30' 
+                  : file 
+                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
+                    : 'border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700/30'
+              }`}
+              onDragEnter={handleDragEnter}
+              onDragLeave={handleDragLeave}
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
             >
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                <HiOutlineUpload className={`w-10 h-10 mb-3 ${file ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`} />
+                <HiOutlineUpload className={`w-10 h-10 mb-3 ${file || isDragging ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`} />
                 {file ? (
                   <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     <span className="font-semibold text-blue-700 dark:text-blue-400">{file.name}</span>
@@ -295,7 +336,12 @@ const SAST = () => {
 
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold">SAST Scan History</h2>
+          <div className="flex items-center space-x-2">
+            <h2 className="text-lg font-semibold">SAST Scan History</h2>
+            <span className="px-2 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full">
+              {filteredHistory.length} {filteredHistory.length === 1 ? 'entry' : 'entries'}
+            </span>
+          </div>
         </div>
         <div className="mb-4">
           <input 

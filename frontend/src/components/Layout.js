@@ -78,24 +78,33 @@ const Layout = ({ children, userName, darkMode, toggleDarkMode, handleLogout }) 
           <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
             <button 
               onClick={toggleDarkMode} 
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="group relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               aria-label="Toggle Dark Mode"
             >
               {darkMode ? <HiOutlineSun className="h-5 w-5" /> : <HiOutlineMoon className="h-5 w-5" />}
+              <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs font-medium text-white bg-gray-900 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                {darkMode ? 'Light Mode' : 'Dark Mode'}
+              </span>
             </button>
             <Link 
               to="/profile" 
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="group relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               aria-label="Profile"
             >
               <HiOutlineUser className="h-5 w-5" />
+              <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs font-medium text-white bg-gray-900 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                Profile
+              </span>
             </Link>
             <button 
               onClick={handleLogout} 
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="group relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               aria-label="Logout"
             >
               <HiOutlineLogout className="h-5 w-5" />
+              <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs font-medium text-white bg-gray-900 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                Logout
+              </span>
             </button>
           </div>
         </aside>
@@ -105,14 +114,23 @@ const Layout = ({ children, userName, darkMode, toggleDarkMode, handleLogout }) 
           <div className="bg-white dark:bg-gray-800 shadow p-4 flex justify-between items-center mb-6 rounded-lg">
             <h1 id="page-title" className="text-lg font-semibold">{getPageTitle()}</h1>
             <div className="flex items-center space-x-4 md:hidden">
-              <button onClick={toggleDarkMode} aria-label="Toggle Dark Mode">
+              <button onClick={toggleDarkMode} aria-label="Toggle Dark Mode" className="group relative">
                 {darkMode ? <HiOutlineSun className="h-5 w-5" /> : <HiOutlineMoon className="h-5 w-5" />}
+                <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs font-medium text-white bg-gray-900 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  {darkMode ? 'Light Mode' : 'Dark Mode'}
+                </span>
               </button>
-              <Link to="/profile" className="hover:underline">
+              <Link to="/profile" className="group relative hover:underline">
                 <HiOutlineUser className="h-5 w-5" />
+                <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs font-medium text-white bg-gray-900 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  Profile
+                </span>
               </Link>
-              <button onClick={handleLogout} aria-label="Logout">
+              <button onClick={handleLogout} aria-label="Logout" className="group relative">
                 <HiOutlineLogout className="h-5 w-5" />
+                <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs font-medium text-white bg-gray-900 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  Logout
+                </span>
               </button>
             </div>
           </div>
